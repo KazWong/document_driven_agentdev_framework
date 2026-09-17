@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/robotics-agent/agent-result.schema.json",
+  "title": "Structured AI agent result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "decision", "summary", "deliverable_markdown", "scope_change", "findings", "evidence"],
+  "properties": {
+    "status": {"enum": ["completed", "blocked", "failed"]},
+    "decision": {"enum": ["pass", "fail", "blocked", "not_applicable"]},
+    "summary": {"type": "string", "minLength": 1},
+    "deliverable_markdown": {"type": "string"},
+    "scope_change": {"type": "boolean"},
+    "findings": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "string"}}
+  }
+}

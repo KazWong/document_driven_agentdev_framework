@@ -1,0 +1,9 @@
+.git
+.env
+.agent-state
+.test-results
+.pytest_cache
+**/__pycache__
+*.pyc
+*.tar.gz
+*.zip

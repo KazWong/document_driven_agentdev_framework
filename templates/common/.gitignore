@@ -1,0 +1,9 @@
+build/
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+*.pyc
+.test-results/
+.agent-state/
+compile_commands.json

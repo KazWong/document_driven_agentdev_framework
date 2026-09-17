@@ -1,0 +1,32 @@
+schema_version: 1
+id: PROJECT-001
+title: Describe the first change
+repository: projects/__PROJECT_NAME__
+base_branch: main
+risk_class: R1
+project_kind: generic
+goal: Describe the measurable outcome.
+scope:
+  include: ["src/**", "include/**", "test/**", "tests/**", "scripts/**"]
+  exclude: ["deployment/**"]
+acceptance_criteria:
+  - Existing behavior remains covered.
+  - New behavior is verified.
+verification:
+  local:
+    - id: project-verification
+      command: [bash, scripts/ci/verify.sh]
+      timeout_seconds: 900
+  integration:
+    - lane: generic
+      action: test
+      args: []
+isolation:
+  strategy: worktree
+human_gates:
+  pull_request_creation: required
+  merge: required
+promotion:
+  physical_hardware: prohibited
+rollback:
+  method: revert_commit

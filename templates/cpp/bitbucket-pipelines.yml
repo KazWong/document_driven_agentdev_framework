@@ -1,0 +1,15 @@
+image: ubuntu:24.04
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: C++20 verification
+          caches: [apt]
+          script:
+            - apt-get update && apt-get install -y build-essential cmake ninja-build
+            - ./scripts/ci/verify.sh
+          artifacts:
+            - build/**
+definitions:
+  caches:
+    apt: /var/cache/apt

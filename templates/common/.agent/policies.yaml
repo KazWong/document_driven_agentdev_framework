@@ -1,0 +1,33 @@
+schema_version: 1
+risk_classes:
+  R0:
+    examples: [documentation, comments, formatting]
+    local_verification_required: false
+    integration_required: false
+    safety_review_required: false
+    merge_approvals: 1
+  R1:
+    examples: [ordinary application code, tools, normal bug fixes]
+    local_verification_required: true
+    integration_required: false
+    safety_review_required: false
+    merge_approvals: 1
+  R2:
+    examples: [ROS behavior, concurrency, navigation, control logic, safety configuration]
+    local_verification_required: true
+    integration_required: true
+    safety_review_required: true
+    merge_approvals: 2
+  R3:
+    examples: [firmware flashing, actuator interfaces, bootloaders, physical deployment]
+    local_verification_required: true
+    integration_required: true
+    safety_review_required: true
+    merge_approvals: 2
+    hardware_approvals: 2
+immutable_rules:
+  - Agents never push or merge without human authorization.
+  - Agents never create a pull request without the PR gate.
+  - Physical hardware is never exposed to automatic test lanes.
+  - A coding agent never performs final review.
+  - Evidence and transition history are append-only operational records.

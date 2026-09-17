@@ -1,0 +1,44 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "disabled"
+
+[sandbox_workspace_write]
+network_access = false
+
+[agents]
+max_threads = 4
+max_depth = 2
+job_max_runtime_seconds = 3600
+
+[agents.planner]
+description = "Read-only planning gate"
+config_file = "agents/planner.toml"
+
+[agents.coder]
+description = "Single-writer implementation agent"
+config_file = "agents/coder.toml"
+
+[agents.tester]
+description = "Independent local-test evidence analyst"
+config_file = "agents/tester.toml"
+
+[agents.integration_tester]
+description = "Independent environment-test evidence analyst"
+config_file = "agents/integration_tester.toml"
+
+[agents.debugger]
+description = "Read-only failure diagnosis agent"
+config_file = "agents/debugger.toml"
+
+[agents.reviewer]
+description = "Independent change reviewer"
+config_file = "agents/reviewer.toml"
+
+[agents.review_requester]
+description = "Pull-request package preparer"
+config_file = "agents/review_requester.toml"
+
+[agents.safety_reviewer]
+description = "Independent robotics safety reviewer"
+config_file = "agents/safety_reviewer.toml"

@@ -1,0 +1,9 @@
+image: ubuntu:24.04
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Bash verification
+          script:
+            - apt-get update && apt-get install -y bats shellcheck
+            - ./scripts/ci/verify.sh

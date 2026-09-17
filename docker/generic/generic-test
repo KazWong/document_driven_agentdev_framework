@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+WORKSPACE="${AGENT_WORKSPACE_ROOT:-/home/kazwong/codes/agents}"
+
+fail() { printf 'generic-test: %s\n' "$*" >&2; exit 2; }
+resolve_project() {
+  local candidate="$1" resolved
+  [[ "$candidate" = /* ]] || candidate="$WORKSPACE/$candidate"
+  resolved="$(realpath -m "$candidate")"
+  [[ "$resolved" == "$WORKSPACE"/* ]] || fail "project must be under $WORKSPACE"
+  [[ -d "$resolved" ]] || fail "project not found: $resolved"
+  printf '%s\n' "$resolved"
+}
+write_summary() {
+  local path="$1" stage="$2" rc="$3" log="$4"
+  python3 - "$path" "$stage" "$rc" "$log" <<'PY'
+import json, pathlib, sys, datetime
+path, stage, rc, log = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4]
+data = {"schema_version": 1, "stage": stage, "passed": rc == 0, "returncode": rc,
+        "log": log, "generated_at": datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()}
+pathlib.Path(path).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+PY
+}
+smoke() {
+  local result="$WORKSPACE/.test-results/generic-container-smoke/latest"
+  rm -rf "$result"; mkdir -p "$result"
+  local tmp rc=0
+  tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' RETURN
+  {
+    gcc --version | head -n1
+    g++ --version | head -n1
+    cmake --version | head -n1
+    python3 --version
+    shellcheck --version | head -n2
+    printf 'int main(void){return 0;}\n' > "$tmp/smoke.c"
+    gcc -std=c11 -Wall -Wextra -Werror "$tmp/smoke.c" -o "$tmp/smoke-c"
+    "$tmp/smoke-c"
+    printf '#include <iostream>\nint main(){std::cout << "ok\\n";}\n' > "$tmp/smoke.cpp"
+    g++ -std=c++20 -Wall -Wextra -Werror "$tmp/smoke.cpp" -o "$tmp/smoke-cpp"
+    "$tmp/smoke-cpp"
+    python3 -c 'print("python-ok")'
+  } >"$result/smoke.log" 2>&1 || rc=$?
+  write_summary "$result/summary.json" "$([[ $rc -eq 0 ]] && echo passed || echo failed)" "$rc" "$result/smoke.log"
+  cat "$result/smoke.log"
+  return "$rc"
+}
+test_project() {
+  local project result log rc=0
+  project="$(resolve_project "$1")"; shift
+  result="$project/.test-results/generic/latest"
+  rm -rf "$result"; mkdir -p "$result"
+  log="$result/test.log"
+  if [[ -x "$project/scripts/ci/verify.sh" ]]; then
+    (cd "$project" && ./scripts/ci/verify.sh "$@") >"$log" 2>&1 || rc=$?
+  elif [[ -f "$project/CMakeLists.txt" ]]; then
+    (cd "$project" && cmake -S . -B build/agent-generic -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build/agent-generic && ctest --test-dir build/agent-generic --output-on-failure) >"$log" 2>&1 || rc=$?
+  elif [[ -f "$project/pyproject.toml" || -f "$project/pytest.ini" ]]; then
+    (cd "$project" && python3 -m pytest "$@") >"$log" 2>&1 || rc=$?
+  elif compgen -G "$project/test/*.bats" >/dev/null; then
+    (cd "$project" && bats test/*.bats) >"$log" 2>&1 || rc=$?
+  else
+    printf 'No supported project verification entry point found.\n' >"$log"; rc=3
+  fi
+  write_summary "$result/summary.json" "$([[ $rc -eq 0 ]] && echo passed || echo test_failed)" "$rc" "$log"
+  cat "$log"
+  return "$rc"
+}
+case "${1:-}" in
+  smoke) shift; smoke "$@" ;;
+  test) shift; [[ $# -ge 1 ]] || fail "test requires PROJECT"; test_project "$@" ;;
+  *) fail "usage: generic-test {smoke|test PROJECT [ARGS...]}" ;;
+esac

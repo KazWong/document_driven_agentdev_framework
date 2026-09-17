@@ -1,0 +1,36 @@
+schema_version: 1
+workspace_root: /home/kazwong/codes/agents
+compose_project: robotics-agent-tests
+lanes:
+  generic:
+    type: compose
+    description: Ubuntu 24.04 C/C++/Python/Bash verification lane
+    compose_files:
+      - ${ENV_ROOT}/compose.yaml
+    service: generic-test
+    runner: /usr/local/bin/generic-test
+    capabilities: [smoke, test, shell, build, doctor]
+    evidence_pattern: PROJECT/.test-results/generic/latest/
+  firmware-emulation:
+    aliases: [firmware]
+    type: compose
+    description: ARM/AVR firmware compilation and QEMU/OpenOCD tooling without device access
+    compose_files:
+      - ${ENV_ROOT}/compose.yaml
+    service: firmware-test
+    runner: /usr/local/bin/firmware-test
+    capabilities: [smoke, test, shell, build, doctor]
+    evidence_pattern: PROJECT/.test-results/firmware/latest/
+  ros2-humble:
+    aliases: [ros2-gazebo, ros2]
+    type: external-cli
+    description: Required ROS 2 Humble and Gazebo Fortress testing contract
+    root: ${WORKSPACE_ROOT}/infrastructure/ros2-humble-gazebo-test
+    executable: ros2-test
+    capabilities: [smoke, test, sim, shell, gui-shell, debug-shell, build, configure, doctor]
+    evidence_pattern: PROJECT/.test-results/ros2-humble/
+    contract:
+      expected_ros_distro: humble
+      command: ./ros2-test
+      summary: PROJECT/.test-results/ros2-humble/latest/summary.json
+      simulation_summary: PROJECT/.test-results/ros2-humble/simulation/latest.log.summary.json

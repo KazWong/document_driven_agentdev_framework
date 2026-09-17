@@ -1,0 +1,94 @@
+name: robotics-ai-agent-dev
+
+x-workspace-volume: &workspace
+  type: bind
+  source: /home/kazwong/codes/agents
+  target: /home/kazwong/codes/agents
+  bind:
+    create_host_path: true
+
+services:
+  main-development:
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.0}
+    build:
+      context: .
+      dockerfile: docker/main/Dockerfile
+      args:
+        USERNAME: ${DEV_USERNAME:-kazwong}
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+        CODEX_VERSION: ${CODEX_VERSION:-latest}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    group_add:
+      - "${DOCKER_GID:-999}"
+    working_dir: /home/kazwong/codes/agents
+    environment:
+      HOME: /home/${DEV_USERNAME:-kazwong}
+      CODEX_HOME: /home/kazwong/codes/agents/.agent-state/codex-home
+      AGENT_WORKSPACE_ROOT: /home/kazwong/codes/agents
+      AGENT_STATE_ROOT: /home/kazwong/codes/agents/.agent-state
+      ROBOTICS_AGENT_ENV_ROOT: /opt/robotics-agent-env
+      CCACHE_DIR: /home/kazwong/codes/agents/.agent-state/cache/ccache
+      PIP_CACHE_DIR: /home/kazwong/codes/agents/.agent-state/cache/pip
+      UV_CACHE_DIR: /home/kazwong/codes/agents/.agent-state/cache/uv
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - *workspace
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    stdin_open: true
+    tty: true
+    command: ["sleep", "infinity"]
+
+  generic-test:
+    profiles: ["test"]
+    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.0}
+    build:
+      context: .
+      dockerfile: docker/generic/Dockerfile
+      args:
+        USERNAME: ${DEV_USERNAME:-kazwong}
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /home/kazwong/codes/agents
+    environment:
+      HOME: /home/${DEV_USERNAME:-kazwong}
+      AGENT_WORKSPACE_ROOT: /home/kazwong/codes/agents
+      CCACHE_DIR: /home/kazwong/codes/agents/.agent-state/cache/ccache-generic
+      PIP_CACHE_DIR: /home/kazwong/codes/agents/.agent-state/cache/pip
+      CI: "true"
+    volumes:
+      - *workspace
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    init: true
+
+  firmware-test:
+    profiles: ["test"]
+    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.0}
+    build:
+      context: .
+      dockerfile: docker/firmware/Dockerfile
+      args:
+        USERNAME: ${DEV_USERNAME:-kazwong}
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /home/kazwong/codes/agents
+    environment:
+      HOME: /home/${DEV_USERNAME:-kazwong}
+      AGENT_WORKSPACE_ROOT: /home/kazwong/codes/agents
+      PLATFORMIO_CORE_DIR: /home/kazwong/codes/agents/.agent-state/cache/platformio
+      CI: "true"
+    volumes:
+      - *workspace
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    init: true

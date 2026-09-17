@@ -1,0 +1,58 @@
+schema_version: 1
+id: RBT-123
+title: Add velocity-command watchdog
+repository: projects/robot-control
+base_branch: main
+risk_class: R2
+project_kind: ros2
+goal: Disable commanded motion when velocity commands exceed the configured maximum age.
+scope:
+  include:
+    - src/**
+    - include/**
+    - test/**
+    - launch/**
+  exclude:
+    - firmware/**
+    - deployment/**
+acceptance_criteria:
+  - Stale commands are rejected after the configured timeout.
+  - Fresh commands remain unaffected.
+  - Timeout behavior uses monotonic time.
+  - Local and ROS 2 Humble integration tests pass.
+verification:
+  local:
+    - id: project-verification
+      command: [bash, scripts/ci/verify.sh]
+      timeout_seconds: 900
+  integration:
+    - lane: generic
+      action: test
+      args: []
+    - lane: ros2-humble
+      action: test
+      args: [--clean]
+    - lane: ros2-humble
+      action: sim
+      args:
+        - --headless
+        - --timeout
+        - "120"
+        - --expect-timeout
+        - --
+        - ros2
+        - launch
+        - robot_bringup
+        - simulation.launch.py
+        - gui:=false
+isolation:
+  strategy: worktree
+human_gates:
+  plan_change: required
+  pull_request_creation: required
+  merge: required
+  physical_execution: required
+promotion:
+  physical_hardware: prohibited
+rollback:
+  method: revert_commit

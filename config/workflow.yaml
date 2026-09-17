@@ -1,0 +1,29 @@
+schema_version: 1
+name: agent-gated-sdlc
+states:
+  - INTAKE
+  - PLANNED
+  - PLAN_APPROVED
+  - IMPLEMENTED
+  - LOCALLY_VERIFIED
+  - ENV_VERIFIED
+  - REVIEWED
+  - PR_READY
+  - CI_VERIFIED
+  - MERGE_APPROVED
+  - PROMOTED
+  - CLOSED
+failure_states: [DIAGNOSING, DIAGNOSED, BLOCKED]
+human_gates:
+  PLANNED: plan
+  PR_READY: pr
+  CI_VERIFIED: merge
+  MERGE_APPROVED: hardware-when-required
+roles:
+  INTAKE: planner
+  PLAN_APPROVED: coder
+  IMPLEMENTED: tester
+  LOCALLY_VERIFIED: integration_tester
+  ENV_VERIFIED: [safety_reviewer-when-required, reviewer]
+  REVIEWED: review_requester
+  DIAGNOSING: debugger

@@ -1,0 +1,10 @@
+image: python:3.12-bookworm
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Python verification
+          caches: [pip]
+          script:
+            - pip install -e . pytest ruff
+            - ./scripts/ci/verify.sh

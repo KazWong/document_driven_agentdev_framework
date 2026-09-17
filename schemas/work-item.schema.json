@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/robotics-agent/work-item.schema.json",
+  "title": "Agent-gated robotics work item",
+  "type": "object",
+  "required": ["schema_version", "id", "title", "repository", "risk_class", "project_kind", "goal", "scope", "acceptance_criteria", "verification", "isolation", "promotion"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{1,63}$"},
+    "title": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "base_branch": {"type": "string", "minLength": 1},
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+    "project_kind": {"enum": ["generic", "ros2", "firmware", "mixed"]},
+    "goal": {"type": "string", "minLength": 1},
+    "scope": {
+      "type": "object",
+      "required": ["include"],
+      "properties": {
+        "include": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "exclude": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "verification": {
+      "type": "object",
+      "properties": {
+        "local": {"type": "array"},
+        "integration": {"type": "array"}
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "required": ["strategy"],
+      "properties": {"strategy": {"enum": ["worktree", "in-place"]}}
+    },
+    "promotion": {
+      "type": "object",
+      "required": ["physical_hardware"],
+      "properties": {"physical_hardware": {"enum": ["prohibited", "human-approved"]}}
+    }
+  }
+}
