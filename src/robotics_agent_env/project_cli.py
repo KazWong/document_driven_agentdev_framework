@@ -22,8 +22,8 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument("--no-initial-commit", action="store_true")
     args = parser.parse_args(argv)
     try:
-        if not re.fullmatch(r"[a-z][a-z0-9-]{1,62}", args.name):
-            raise AgentEnvError("project name must be 2-63 lowercase letters, digits, and hyphens")
+        if not re.fullmatch(r"[a-z][a-z0-9_-]{1,62}", args.name):
+            raise AgentEnvError("project name must be 2-63 lowercase letters, digits, hyphens, and underscores")
         destination = Path(args.destination) if args.destination else workspace_root() / "projects" / args.name
         if not destination.is_absolute():
             destination = workspace_root() / destination

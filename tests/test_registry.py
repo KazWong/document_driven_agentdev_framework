@@ -22,3 +22,14 @@ def test_compose_lane_never_adds_hardware(workspace: Path) -> None:
     command = TestController(TestRegistry()).build_command("firmware", "test", project, [])
     assert "compose.hardware.yaml" not in " ".join(command)
     assert "--device" not in command
+
+
+def test_external_lane_runs_from_environment_root(workspace: Path, monkeypatch) -> None:
+    root = workspace / "infrastructure" / "ros2-humble-gazebo-test"
+    root.mkdir(parents=True)
+    runner = root / "ros2-test"
+    runner.write_text("#!/usr/bin/env bash\npwd\n")
+    runner.chmod(0o755)
+    result = TestController(TestRegistry()).run("ros2-humble", "doctor")
+    assert result.returncode == 0
+    assert result.stdout.strip() == str(root)

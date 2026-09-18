@@ -20,7 +20,7 @@ REQUIRED = [
     "bin/projectctl", "bin/bitbucket-pr", "bin/hardwarectl",
     "docker/main/Dockerfile", "docker/generic/Dockerfile", "docker/firmware/Dockerfile",
     "schemas/work-item.schema.json", "schemas/agent-result.schema.json",
-    "docs/source-reconciliation.md",
+    "docs/source-reconciliation.md", "scripts/codex-login.sh",
 ]
 ROLES = {
     "planner", "coder", "tester", "integration_tester", "debugger",
@@ -41,8 +41,8 @@ def main() -> int:
             errors.append(f"missing required file: {relative}")
     checks.append("required files")
 
-    if (root / "VERSION").read_text().strip() != "2.0.0":
-        errors.append("VERSION must be 2.0.0")
+    if (root / "VERSION").read_text().strip() != "2.0.1":
+        errors.append("VERSION must be 2.0.1")
 
     for path in root.rglob("*.json"):
         try:
@@ -74,7 +74,7 @@ def main() -> int:
 
     compose = yaml.safe_load((root / "compose.yaml").read_text())
     services = compose.get("services", {})
-    for name in ("main-development", "generic-test", "firmware-test"):
+    for name in ("main-development", "codex-login", "generic-test", "firmware-test"):
         if name not in services:
             errors.append(f"compose service missing: {name}")
             continue
@@ -84,6 +84,13 @@ def main() -> int:
     main_mounts = services.get("main-development", {}).get("volumes", [])
     if not any(isinstance(mount, dict) and mount.get("source") == "/var/run/docker.sock" for mount in main_mounts):
         errors.append("main-development lacks Docker socket")
+    auth = services.get("codex-login", {})
+    if auth.get("network_mode") != "host":
+        errors.append("codex-login must use host networking for localhost OAuth callback")
+    if any(isinstance(mount, dict) and mount.get("source") == "/var/run/docker.sock" for mount in auth.get("volumes", [])):
+        errors.append("codex-login must not receive the Docker socket")
+    if "auth" not in auth.get("profiles", []):
+        errors.append("codex-login must be opt-in through the auth profile")
     for name in ("generic-test", "firmware-test"):
         if services.get(name, {}).get("devices"):
             errors.append(f"default service {name} must not expose devices")
@@ -120,7 +127,7 @@ def main() -> int:
 
     executable_candidates = list((root / "bin").glob("*")) + [
         root / "scripts/bootstrap-host.sh", root / "scripts/entrypoint.sh",
-        root / "scripts/qa.sh", root / "scripts/package.sh",
+        root / "scripts/qa.sh", root / "scripts/package.sh", root / "scripts/codex-login.sh",
         root / "docker/generic/generic-test", root / "docker/firmware/firmware-test",
     ]
     for path in executable_candidates:

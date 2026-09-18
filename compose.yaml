@@ -9,7 +9,7 @@ x-workspace-volume: &workspace
 
 services:
   main-development:
-    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.0}
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.1}
     build:
       context: .
       dockerfile: docker/main/Dockerfile
@@ -17,6 +17,7 @@ services:
         USERNAME: ${DEV_USERNAME:-kazwong}
         USER_UID: ${HOST_UID:-1000}
         USER_GID: ${HOST_GID:-1000}
+        DOCKER_GID: ${DOCKER_GID:-999}
         CODEX_VERSION: ${CODEX_VERSION:-latest}
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     group_add:
@@ -44,9 +45,40 @@ services:
     tty: true
     command: ["sleep", "infinity"]
 
+
+  codex-login:
+    profiles: ["auth"]
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.1}
+    build:
+      context: .
+      dockerfile: docker/main/Dockerfile
+      args:
+        USERNAME: ${DEV_USERNAME:-kazwong}
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+        DOCKER_GID: ${DOCKER_GID:-999}
+        CODEX_VERSION: ${CODEX_VERSION:-latest}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /home/kazwong/codes/agents
+    network_mode: host
+    environment:
+      HOME: /home/${DEV_USERNAME:-kazwong}
+      CODEX_HOME: /home/kazwong/codes/agents/.agent-state/codex-home
+      AGENT_WORKSPACE_ROOT: /home/kazwong/codes/agents
+      AGENT_STATE_ROOT: /home/kazwong/codes/agents/.agent-state
+      ROBOTICS_AGENT_ENV_ROOT: /opt/robotics-agent-env
+    volumes:
+      - *workspace
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    stdin_open: true
+    tty: true
+
   generic-test:
     profiles: ["test"]
-    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.0}
+    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.1}
     build:
       context: .
       dockerfile: docker/generic/Dockerfile
@@ -71,7 +103,7 @@ services:
 
   firmware-test:
     profiles: ["test"]
-    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.0}
+    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.1}
     build:
       context: .
       dockerfile: docker/firmware/Dockerfile

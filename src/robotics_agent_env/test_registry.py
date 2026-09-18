@@ -158,9 +158,12 @@ class TestController:
                 )
             if not os.access(executable, os.X_OK):
                 raise AgentEnvError(f"external test command is not executable: {executable}")
+        run_cwd = None
+        if lane.config.get("type") == "external-cli":
+            run_cwd = str(Path(lane.config["root"]))
         try:
             completed = subprocess.run(
-                command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                command, cwd=run_cwd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 timeout=timeout, check=False,
             )
         except FileNotFoundError as exc:

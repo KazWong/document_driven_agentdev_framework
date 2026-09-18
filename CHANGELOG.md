@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.1 — 2026-09-17
+
+### Fixed
+
+- Refresh host UID/GID and Docker socket GID during bootstrap without overwriting unrelated `.env` settings.
+- Add a named Docker-socket group to the main image and pass `DOCKER_GID` as a build argument.
+- Include templates, Compose files, and local test Docker assets in the main image.
+- Install Bubblewrap in the main image so Codex sandboxing fails closed instead of requiring an unrestricted fallback.
+- Accept underscore project names.
+- Pass Codex global approval arguments before `exec` and restrict the environment inherited by Codex role processes.
+- Support three Codex authentication paths: browser ChatGPT OAuth, ChatGPT device-code login, and API-key login.
+- Add a temporary host-networked authentication helper so browser OAuth works for both local Docker and laptop-to-remote-host Docker workflows without changing normal container networking.
+- Run the external ROS 2 Humble test contract from its declared environment root.
+- Expand `agentctl doctor` to check Codex, Docker, Bubblewrap, and Docker-socket accessibility.
+
 ## 2.0.0 — 2026-09-03
 
 ### Added

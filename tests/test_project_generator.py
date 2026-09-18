@@ -19,3 +19,10 @@ def test_generates_project(workspace: Path, kind: str) -> None:
     assert (project / "scripts" / "ci" / "verify.sh").is_file()
     completed = subprocess.run(["git", "-C", str(project), "rev-parse", "--verify", "HEAD"], check=False)
     assert completed.returncode == 0
+
+
+def test_generates_project_with_underscore(workspace: Path) -> None:
+    name = "sample_python"
+    assert main(["create", "--type", "python", "--name", name]) == 0
+    project = workspace / "projects" / name
+    assert (project / "src" / name / "core.py").is_file()

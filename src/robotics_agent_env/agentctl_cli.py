@@ -263,10 +263,22 @@ def main(argv: list[str] | None = None) -> int:
                 "workspace_exists": workspace_root().is_dir(),
                 "workspace_writable": os.access(workspace_root(), os.W_OK) if workspace_root().exists() else False,
                 "state_root": str(state_root()),
-                "commands": {name: command_exists(name) for name in ["codex", "docker", "git", "python3"]},
+                "commands": {name: command_exists(name) for name in ["codex", "docker", "git", "python3", "bwrap"]},
+                "docker_socket": {
+                    "path": "/var/run/docker.sock",
+                    "exists": Path("/var/run/docker.sock").exists(),
+                    "readable": os.access("/var/run/docker.sock", os.R_OK),
+                    "writable": os.access("/var/run/docker.sock", os.W_OK),
+                },
                 "test_lanes": [TestController(TestRegistry()).doctor(name) for name in TestRegistry().names()],
             }
-            ready = report["workspace_exists"] and report["workspace_writable"] and report["commands"]["git"] and report["commands"]["python3"]
+            ready = (
+                report["workspace_exists"] and report["workspace_writable"]
+                and report["commands"]["git"] and report["commands"]["python3"]
+                and report["commands"]["codex"] and report["commands"]["docker"]
+                and report["commands"]["bwrap"]
+                and report["docker_socket"]["exists"] and report["docker_socket"]["readable"] and report["docker_socket"]["writable"]
+            )
             report["ready"] = ready
             if args.json:
                 print(json.dumps(report, indent=2, sort_keys=True))

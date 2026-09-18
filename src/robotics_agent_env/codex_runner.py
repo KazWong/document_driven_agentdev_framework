@@ -102,15 +102,19 @@ def dispatch_role(item: WorkItem, role: str, *, context: dict[str, Any] | None =
     schema_path = env_root() / "schemas" / "agent-result.schema.json"
     codex_bin = os.environ.get("CODEX_BIN", "codex")
     command = [
-        codex_bin, "exec", "--cd", str(item.repo), "--sandbox", ROLE_SANDBOX[role],
-        "--ask-for-approval", "never", "--ephemeral", "--json",
+        codex_bin, "--ask-for-approval", "never", "exec", "--cd", str(item.repo),
+        "--sandbox", ROLE_SANDBOX[role], "--ephemeral", "--json",
         "--output-schema", str(schema_path), "--output-last-message", str(result_path),
         "--config", f"web_search={_toml_string('disabled')}",
         "--config", f"developer_instructions={_toml_string(instructions)}", "-",
     ]
     atomic_write_text(run_dir / "command.txt", shell_join(command) + "\n")
-    env = os.environ.copy()
-    env.setdefault("CODEX_HOME", str(item.state_root / "codex-home"))
+    allowed_env = {
+        "HOME", "USER", "LOGNAME", "PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM",
+        "COLORTERM", "NO_COLOR", "CI", "TMPDIR", "XDG_RUNTIME_DIR",
+    }
+    env = {key: value for key, value in os.environ.items() if key in allowed_env}
+    env["CODEX_HOME"] = os.environ.get("CODEX_HOME", str(item.state_root / "codex-home"))
     try:
         completed = subprocess.run(
             command, cwd=str(item.repo), env=env, input=prompt, text=True,

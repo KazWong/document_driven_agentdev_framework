@@ -121,6 +121,61 @@ make shell
 ./scripts/sync-codex-config.sh --force
 ```
 
+### Codex authentication
+
+The framework supports all three OpenAI Codex CLI authentication paths while keeping credentials in the persistent `CODEX_HOME` under `.agent-state/codex-home`.
+
+**1. Sign in with ChatGPT (browser OAuth)**
+
+For a laptop running Docker locally:
+
+```bash
+make codex-login-chatgpt
+```
+
+Open the URL printed by Codex in the laptop browser. The temporary `codex-login` service uses host networking so Codex's `localhost:1455` callback is on the Docker host. The normal `main-development` service does not use host networking.
+
+For laptop -> remote host -> Docker, first create an SSH tunnel from the laptop and keep it open:
+
+```bash
+ssh -L 1455:127.0.0.1:1455 <user>@<remote-host>
+```
+
+Then, on the remote host:
+
+```bash
+make codex-login-chatgpt
+```
+
+Open the printed URL in the laptop browser. The browser callback to `localhost:1455` crosses the SSH tunnel to the temporary host-networked auth container.
+
+**2. ChatGPT device-code login**
+
+This avoids the localhost callback and is suitable for remote/headless environments:
+
+```bash
+make codex-login-device
+```
+
+**3. OpenAI API-key login**
+
+Set the API key only in the host shell, then pipe it to Codex on stdin:
+
+```bash
+export OPENAI_API_KEY='...'
+make codex-login-api-key
+unset OPENAI_API_KEY
+```
+
+The helper does not place the key in command-line arguments or `.env`.
+
+Check or clear the persistent login with:
+
+```bash
+make codex-login-status
+make codex-logout
+```
+
 ## Verify the environments
 
 Inside the main container:
