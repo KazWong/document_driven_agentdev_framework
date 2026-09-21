@@ -4,6 +4,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE=(docker compose -f "$ROOT/compose.yaml" --profile auth)
 
+inside_main_container() {
+  [[ -f /.dockerenv ]] && command -v codex >/dev/null 2>&1 && [[ -n "${CODEX_HOME:-}" ]]
+}
+
+main_container_running() {
+  [[ -n "$(docker compose -f "$ROOT/compose.yaml" ps --status running -q main-development 2>/dev/null || true)" ]]
+}
+
+run_status_cleanly() {
+  local stderr_file rc
+  stderr_file="$(mktemp)"
+  if "$@" 2>"$stderr_file"; then
+    rc=0
+  else
+    rc=$?
+  fi
+  grep -v '^WARNING: failed to clean up stale arg0 temp dirs:' "$stderr_file" >&2 || true
+  rm -f "$stderr_file"
+  return "$rc"
+}
+
 usage() {
   cat <<'USAGE'
 Usage: scripts/codex-login.sh <chatgpt|device|api-key|status|logout>
@@ -52,10 +73,22 @@ EOF2
     printf '%s\n' "$OPENAI_API_KEY" | "${COMPOSE[@]}" run --rm --no-deps -T codex-login codex login --with-api-key
     ;;
   status)
-    exec "${COMPOSE[@]}" run --rm --no-deps -T codex-login codex login status
+    if inside_main_container; then
+      run_status_cleanly codex login status
+    elif main_container_running; then
+      run_status_cleanly docker compose -f "$ROOT/compose.yaml" exec -T main-development codex login status
+    else
+      run_status_cleanly "${COMPOSE[@]}" run --rm --no-deps -T codex-login codex login status
+    fi
     ;;
   logout)
-    exec "${COMPOSE[@]}" run --rm --no-deps -T codex-login codex logout
+    if inside_main_container; then
+      exec codex logout
+    elif main_container_running; then
+      exec docker compose -f "$ROOT/compose.yaml" exec -T main-development codex logout
+    else
+      exec "${COMPOSE[@]}" run --rm --no-deps -T codex-login codex logout
+    fi
     ;;
   -h|--help|help|'')
     usage

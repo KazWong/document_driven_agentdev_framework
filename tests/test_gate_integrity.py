@@ -58,12 +58,12 @@ def test_scope_check_includes_committed_changes(workspace: Path) -> None:
 def test_plan_approval_becomes_stale_when_plan_changes(workspace: Path) -> None:
     repo = init_repo(workspace / "projects" / "app")
     item = create_item(workspace, repo)
-    item.write_artifact("plan.md", "# Plan\n\nFirst version")
+    item.write_plan("# Plan\n\nFirst version")
     item.transition("INTAKE", "PLANNING", event="test")
     item.transition("PLANNING", "PLANNED", event="test")
     item.add_approval("plan", actor="owner")
     assert item.approval_count("plan") == 1
-    item.write_artifact("plan.md", "# Plan\n\nChanged version")
+    item.write_plan("# Plan\n\nChanged version")
     assert item.approval_count("plan") == 0
 
 

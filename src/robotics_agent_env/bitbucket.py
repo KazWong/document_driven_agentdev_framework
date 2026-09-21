@@ -38,8 +38,8 @@ def build_pull_request_payload(
     draft: bool = False, close_source_branch: bool = False,
 ) -> dict[str, Any]:
     status = item.status
-    if status["state"] not in {"PR_READY", "CI_VERIFIED", "MERGE_APPROVED"}:
-        raise AgentEnvError(f"pull request preparation requires PR_READY or later, not {status['state']}")
+    if status["state"] not in {"PR_CREATING", "PR_OPEN", "PR_READY", "CI_VERIFIED", "MERGE_APPROVED"}:
+        raise AgentEnvError(f"pull request preparation requires PR_CREATING or later, not {status['state']}")
     description_path = item.artifacts_path / "pull-request.md"
     if not description_path.is_file():
         raise AgentEnvError("missing pull-request.md artifact")
@@ -59,10 +59,31 @@ def build_pull_request_payload(
     return payload
 
 
-def create_pull_request(item: WorkItem, payload: dict[str, Any]) -> dict[str, Any]:
-    if not item.pr_is_approved():
-        raise AgentEnvError("pull-request creation requires 'agentctl approve <id> pr'")
-    workspace, repository = infer_repository(get_origin(item.repo))
+def get_pull_request(remote: str, pull_request_id: int | str) -> dict[str, Any]:
+    workspace, repository = infer_repository(remote)
+    pr_id = str(pull_request_id).strip()
+    if not re.fullmatch(r"[0-9]{1,20}", pr_id):
+        raise AgentEnvError(f"invalid Bitbucket pull-request id: {pull_request_id}")
+    url = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repository}/pullrequests/{pr_id}"
+    request = urllib.request.Request(
+        url, method="GET",
+        headers={"Accept": "application/json", "Authorization": _authorization_header()},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise AgentEnvError(f"Bitbucket API rejected the request ({exc.code}): {detail[:2000]}") from exc
+    except urllib.error.URLError as exc:
+        raise AgentEnvError(f"Bitbucket API request failed: {exc.reason}") from exc
+    if not isinstance(data, dict):
+        raise AgentEnvError("Bitbucket API returned an unexpected response")
+    return data
+
+
+def create_pull_request(item: WorkItem, payload: dict[str, Any], remote: str | None = None) -> dict[str, Any]:
+    workspace, repository = infer_repository(remote or get_origin(item.repo))
     url = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repository}/pullrequests"
     request = urllib.request.Request(
         url, data=json.dumps(payload).encode("utf-8"), method="POST",

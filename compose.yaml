@@ -9,7 +9,7 @@ x-workspace-volume: &workspace
 
 services:
   main-development:
-    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.1}
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.2}
     build:
       context: .
       dockerfile: docker/main/Dockerfile
@@ -38,8 +38,16 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
+    cap_add:
+      - SYS_ADMIN
+      - SYS_CHROOT
+      - SETUID
+      - SETGID
+      - SYS_PTRACE
+      - NET_ADMIN
     security_opt:
-      - no-new-privileges:true
+      - seccomp=unconfined
+      - apparmor=unconfined
     init: true
     stdin_open: true
     tty: true
@@ -48,7 +56,7 @@ services:
 
   codex-login:
     profiles: ["auth"]
-    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.1}
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.2}
     build:
       context: .
       dockerfile: docker/main/Dockerfile
@@ -78,7 +86,7 @@ services:
 
   generic-test:
     profiles: ["test"]
-    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.1}
+    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.2}
     build:
       context: .
       dockerfile: docker/generic/Dockerfile
@@ -103,7 +111,7 @@ services:
 
   firmware-test:
     profiles: ["test"]
-    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.1}
+    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.2}
     build:
       context: .
       dockerfile: docker/firmware/Dockerfile

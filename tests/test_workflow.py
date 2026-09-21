@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from conftest import init_repo
+from robotics_agent_env import workflow
 from robotics_agent_env.workflow import run_until_gate
 from robotics_agent_env.workitem import WorkItem
 
@@ -59,14 +60,26 @@ def test_full_flow_stops_at_human_gates(workspace: Path, monkeypatch) -> None:
     manifest_path = workspace / "item.yaml"
     manifest_path.write_text(yaml.safe_dump(manifest), encoding="utf-8")
     item = WorkItem.create(manifest_path)
+    requirements = workspace / "requirements.md"
+    requirements.write_text("# Requirement\n\nCreate src/value.txt.\n", encoding="utf-8")
+    item.import_documents([requirements])
     assert run_until_gate(item) == "PLANNED"
     item.add_approval("plan", actor="planner-owner")
     assert item.status["state"] == "PLAN_APPROVED"
-    assert run_until_gate(item) == "PR_READY"
+    def fake_publish(current: WorkItem):
+        candidate = current.require_publishable_candidate()
+        pr = {
+            "provider": "github", "number": 1, "url": "https://example.invalid/pr/1",
+            "state": "OPEN", "head_branch": current.status["branch"], "head_sha": candidate,
+            "base_branch": "main", "status_checks": [], "candidate_sha": candidate,
+        }
+        current.set_pull_request(pr)
+        return pr
+
+    monkeypatch.setattr(workflow, "publish_pull_request", fake_publish)
+    assert run_until_gate(item) == "PR_OPEN"
     assert (item.artifacts_path / "review.md").is_file()
     assert (item.repo / "src" / "value.txt").read_text() == "implemented\n"
-    item.add_approval("pr", actor="maintainer")
-    assert item.pr_is_approved()
     item.record_ci("passed", "https://ci.example.invalid/build/1")
     item.add_approval("merge", actor="maintainer")
     assert item.status["state"] == "MERGE_APPROVED"

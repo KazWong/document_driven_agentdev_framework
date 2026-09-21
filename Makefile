@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 COMPOSE := docker compose -f compose.yaml
 NAME ?=
 
-.PHONY: configure build up shell down logs doctor codex-login codex-login-chatgpt codex-login-device codex-login-api-key codex-login-status codex-logout qa qa-docker smoke smoke-generic smoke-firmware smoke-ros2 project-c project-cpp project-python project-shell package
+.PHONY: configure build up shell down logs doctor codex-login codex-login-chatgpt codex-login-device codex-login-api-key codex-login-status codex-logout github-login github-login-status github-logout qa qa-docker smoke smoke-generic smoke-firmware smoke-ros2 project-c project-cpp project-python project-shell package
 
 configure:
 	./scripts/bootstrap-host.sh
@@ -41,6 +41,15 @@ codex-login-status:
 
 codex-logout:
 	./scripts/codex-login.sh logout
+
+github-login:
+	./scripts/github-login.sh login
+
+github-login-status:
+	./scripts/github-login.sh status
+
+github-logout:
+	./scripts/github-login.sh logout
 
 smoke: smoke-generic smoke-firmware smoke-ros2
 

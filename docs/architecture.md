@@ -2,34 +2,35 @@
 
 ## Responsibility boundaries
 
-The main development bundle owns orchestration, Codex role configuration, work-item state, generic Linux verification, firmware emulation, project generation, and Bitbucket packaging. It does not own the ROS image.
-
-The independently installed `ros2-humble-gazebo-test` bundle owns ROS 2 Humble, Gazebo Fortress, colcon/rosdep behavior, simulation processes, and ROS-specific result formats. Integration occurs only through its stable `ros2-test` command and documented output tree.
+The main development bundle owns document/work-item orchestration, Codex role configuration, candidate Git mechanics, local verification, provider-neutral SCM publication, generic/firmware test orchestration, and project generation. The independently installed `ros2-humble-gazebo-test` bundle owns ROS 2 Humble/Gazebo execution and ROS-specific result production.
 
 ## Runtime topology
 
 ```text
-Host /home/kazwong/codes/agents
-|
-+-- main-development container
-|   +-- Codex CLI
-|   +-- agentctl
-|   +-- testctl
-|   +-- Docker socket
-|
-+-- generic-test container              (created through host Docker)
-+-- firmware-test container             (created through host Docker)
-+-- ros2-humble-gazebo-test containers  (owned by external bundle)
+/home/kazwong/codes/agents
+├── projects/<project>/
+│   ├── .agent/project.yaml                 tracked project/SCM identity
+│   ├── .agent/policies.yaml                tracked project policy
+│   ├── .agent/branching-policy.md          tracked Git reference
+│   └── .agent/work-items/<id>/             ignored canonical operational record
+└── .agent-state/
+    ├── codex-home/
+    ├── github-cli/
+    ├── index/
+    ├── worktrees/<project>/<id>/           disposable development worktree
+    ├── verifiers/integration/.../<sha>/     disposable host-visible verifier checkout
+    ├── cache/
+    └── legacy-work-items/                  migration archive only
 ```
 
-Every container sees `/home/kazwong/codes/agents` at the same absolute path. Therefore a project path emitted by `agentctl` is valid for the host daemon and the delegated test environment without translation.
+The canonical checkout owns work-item metadata. Linked worktrees resolve through Git's common directory to that same project. Deleting/recreating a worktree therefore does not delete documents, plans, trace, runs, approvals, or evidence.
 
-## Workflow topology
+## Verification topology
 
-`agentctl` is a deterministic coordinator, not an autonomous swarm. It selects one role based on the persisted state, writes structured prompts, validates structured results, runs deterministic commands, and records transitions. Only `coder` receives `workspace-write`; all other roles are read-only.
+Local verification clones the exact candidate commit to a container-native temporary filesystem to avoid host/FUSE mode distortion. Integration verification clones the same candidate into the shared workspace so sibling Docker environments can consume it without touching the development worktree. Evidence is copied to the canonical work item before disposable verifier state is removed.
 
-One work item maps to one isolated Git worktree. Multiple work items may run concurrently only in separate worktrees. The coordinator never lets multiple coding agents share one mutable checkout.
+For the ROS Humble external lane, a Docker argv compatibility shim affects only the persistent `docker compose exec ... ros2-test-project` command and sources `/opt/ros/humble/setup.bash` in that actual exec process. Other Docker argv are forwarded unchanged.
 
-## Evidence topology
+## SCM topology
 
-Agent narratives are secondary evidence. The primary sources are process return codes, command vectors, logs, Git state, test summaries, approval snapshots, and SHA-256 indexes. Every state change is recorded in `trace.jsonl`.
+Project `.agent/project.yaml` selects `github` or `bitbucket`, remote, and base branch. The framework pushes only the work-item branch after exact-candidate verification/review, creates the PR, retrieves the remote PR head SHA, and enters `PR_OPEN` only when the remote SHA matches the reviewed candidate. Protected-branch merge remains outside automatic publication and requires human approval/provider protection.

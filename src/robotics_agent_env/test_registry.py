@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -159,11 +160,32 @@ class TestController:
             if not os.access(executable, os.X_OK):
                 raise AgentEnvError(f"external test command is not executable: {executable}")
         run_cwd = None
+        run_env = None
         if lane.config.get("type") == "external-cli":
             run_cwd = str(Path(lane.config["root"]))
+            if lane.name == "ros2-humble" and action == "test":
+                docker_name = os.environ.get("DOCKER_BIN", "docker")
+                real_docker = shutil.which(docker_name)
+                if real_docker is None:
+                    raise AgentEnvError(f"Docker executable not found for ros2-humble lane: {docker_name}")
+                compat_executable = env_root() / "bin" / "ros2-docker-compat"
+                if not compat_executable.is_file() or not os.access(compat_executable, os.X_OK):
+                    raise AgentEnvError(f"ROS2 Docker compatibility shim is missing or not executable: {compat_executable}")
+                compat_dir = Path(os.environ.get("AGENT_STATE_ROOT", str(workspace_root() / ".agent-state"))) / "cache" / "ros2-docker-compat"
+                compat_dir.mkdir(parents=True, exist_ok=True)
+                docker_shim = compat_dir / "docker"
+                if docker_shim.is_symlink() or docker_shim.exists():
+                    if docker_shim.resolve() != compat_executable.resolve():
+                        docker_shim.unlink()
+                if not docker_shim.exists():
+                    docker_shim.symlink_to(compat_executable)
+                run_env = os.environ.copy()
+                run_env["ROBOTICS_REAL_DOCKER"] = str(Path(real_docker).resolve())
+                run_env["PATH"] = f"{compat_dir}:{run_env.get('PATH', '')}"
         try:
             completed = subprocess.run(
-                command, cwd=run_cwd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                command, cwd=run_cwd, env=run_env, text=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 timeout=timeout, check=False,
             )
         except FileNotFoundError as exc:

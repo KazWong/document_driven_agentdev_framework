@@ -1,5 +1,47 @@
 # Changelog
 
+## 2.0.2 — 2026-09-20
+
+### Added
+
+- Project-local canonical work items under `<project>/.agent/work-items/<id>` with lightweight global discovery under `.agent-state/index`.
+- Immutable imported document revisions and `agentctl update`, document-bound immutable plan revisions, and `agentctl plan --retry`.
+- `agentctl inspect` for non-blocking code/candidate inspection and `agentctl reclassify` for audited one-way risk escalation.
+- Provider-neutral `scmctl`, GitHub support through the official `gh` CLI, persistent GitHub CLI state, and automatic GitHub/Bitbucket PR publication.
+- Tracked `.agent/branching-policy.md` reference documents plus a TODO for later configurable deterministic branch-policy enforcement.
+- Framework-owned non-empty candidate commits and exact-candidate SHA binding across local verification, integration verification, AI review, CI, and remote PR head.
+- Detached mode-preserving local verifier checkouts and disposable shared-workspace integration verifier checkouts.
+- ROS Docker exec compatibility shim that sources `/opt/ros/humble/setup.bash` in the actual persistent-container test process.
+- Required ROS test-count validation; an exit-zero lane that executes zero tests now fails closed.
+
+### Changed
+
+- Development is document-driven. Imported snapshots are authoritative project inputs; the work-item manifest controls lifecycle/risk/scope/verification/isolation/promotion.
+- ROS 2 and mixed work-item manifests default to R2 when risk is not explicitly supplied.
+- R2/R3 retain safety review and two distinct merge approvals.
+- The framework now owns candidate commit, feature-branch push, and PR creation. Human review normally occurs on the open remote PR; human merge approval remains mandatory.
+- New work uses `PR_OPEN` rather than a pre-publication `PR_READY` gate.
+- Diagnosis recovery invalidates only current bindings downstream of the selected recovery boundary while preserving historical commits, runs, plans, and evidence.
+- Python project local verification scopes pytest to `tests/` and the main image permanently provides pytest and Ruff.
+- `codex-login-status`/logout are context-aware: direct inside main, `docker compose exec` when main is running, auth helper otherwise.
+- `main-development` receives the bounded outer-container permissions needed for the Codex Bubblewrap sandbox; auth/test services keep their tighter profiles.
+
+### Fixed
+
+- Blocked planner reports can no longer become the current executable plan.
+- Codex Bubblewrap namespace and fresh `/proc` failures inside the main Docker container.
+- ROS persistent-container exec processes losing the ROS environment.
+- Host/FUSE executable-bit artifacts causing Ruff EXE002 false failures.
+- Integration build/install/log output contaminating the development worktree.
+- Integration evidence missing the tested candidate SHA.
+- Exit-zero ROS lanes with zero executed tests being recorded as passed.
+- `resolve --route implementation` retaining stale candidate/local/integration/review bindings and preventing a true implementation retry.
+
+### Removed
+
+- Unused lifecycle aliases `code`, `test`, `integrate`, `review`, `prepare-review`, and `debug`; `agentctl run` remains the lifecycle driver.
+- The human approval gate before PR creation.
+
 ## 2.0.1 — 2026-09-17
 
 ### Fixed

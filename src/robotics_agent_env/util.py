@@ -167,6 +167,39 @@ def git_root(path: Path) -> Path:
     return Path(completed.stdout.strip()).resolve()
 
 
+def git_common_root(path: Path) -> Path:
+    """Return the canonical checkout root for a normal checkout or linked worktree."""
+    repo = git_root(path)
+    completed = git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir", check=False)
+    if completed.returncode != 0 or not completed.stdout.strip():
+        return repo
+    common = Path(completed.stdout.strip()).resolve()
+    if common.name == ".git":
+        return common.parent.resolve()
+    return repo
+
+
+def git_status_paths(repo: Path) -> list[str]:
+    """Return paths with uncommitted changes, including untracked paths."""
+    completed = git(repo, "status", "--porcelain=v1", "-z", check=True)
+    paths: list[str] = []
+    entries = completed.stdout.split("\0")
+    i = 0
+    while i < len(entries):
+        entry = entries[i]
+        i += 1
+        if not entry:
+            continue
+        status = entry[:2]
+        path = entry[3:]
+        paths.append(path)
+        if status and (status[0] in {"R", "C"} or status[1] in {"R", "C"}) and i < len(entries):
+            if entries[i]:
+                paths.append(entries[i])
+            i += 1
+    return sorted(set(paths))
+
+
 def git_branch(repo: Path) -> str:
     return git(repo, "branch", "--show-current", check=True).stdout.strip()
 

@@ -7,7 +7,8 @@ case "$ROOT" in
   *) printf 'bootstrap-host: install this repository under %s before bootstrapping\n' "$WORKSPACE" >&2; exit 2 ;;
 esac
 mkdir -p "$WORKSPACE" "$WORKSPACE/projects" "$WORKSPACE/infrastructure" \
-  "$WORKSPACE/.agent-state/work-items" "$WORKSPACE/.agent-state/worktrees" \
+  "$WORKSPACE/.agent-state/index" "$WORKSPACE/.agent-state/worktrees" \
+  "$WORKSPACE/.agent-state/verifiers/integration" "$WORKSPACE/.agent-state/github-cli" \
   "$WORKSPACE/.agent-state/cache/ccache" "$WORKSPACE/.agent-state/cache/ccache-generic" \
   "$WORKSPACE/.agent-state/cache/pip" "$WORKSPACE/.agent-state/cache/platformio" \
   "$WORKSPACE/.agent-state/cache/uv" "$WORKSPACE/.test-results"
@@ -26,9 +27,9 @@ HOST_GID=$gid
 DOCKER_GID=$docker_gid
 DEV_USERNAME=kazwong
 CODEX_VERSION=latest
-MAIN_IMAGE=robotics-ai-agent-main:2.0.1
-GENERIC_IMAGE=robotics-ai-agent-generic-test:2.0.1
-FIRMWARE_IMAGE=robotics-ai-agent-firmware-test:2.0.1
+MAIN_IMAGE=robotics-ai-agent-main:2.0.2
+GENERIC_IMAGE=robotics-ai-agent-generic-test:2.0.2
+FIRMWARE_IMAGE=robotics-ai-agent-firmware-test:2.0.2
 EOF
 else
   python3 - "$ENV_FILE" "$uid" "$gid" "$docker_gid" <<'PYENV'
@@ -36,20 +37,33 @@ from pathlib import Path
 import sys
 path = Path(sys.argv[1])
 updates = {"HOST_UID": sys.argv[2], "HOST_GID": sys.argv[3], "DOCKER_GID": sys.argv[4]}
+image_migrations = {
+    "MAIN_IMAGE": ("robotics-ai-agent-main:2.0.1", "robotics-ai-agent-main:2.0.2"),
+    "GENERIC_IMAGE": ("robotics-ai-agent-generic-test:2.0.1", "robotics-ai-agent-generic-test:2.0.2"),
+    "FIRMWARE_IMAGE": ("robotics-ai-agent-firmware-test:2.0.1", "robotics-ai-agent-firmware-test:2.0.2"),
+}
 lines = path.read_text(encoding="utf-8").splitlines()
 seen = set()
 out = []
 for line in lines:
     if "=" in line and not line.lstrip().startswith("#"):
-        key = line.split("=", 1)[0]
+        key, value = line.split("=", 1)
         if key in updates:
             out.append(f"{key}={updates[key]}")
+            seen.add(key)
+            continue
+        if key in image_migrations:
+            old_value, new_value = image_migrations[key]
+            out.append(f"{key}={new_value if value == old_value else value}")
             seen.add(key)
             continue
     out.append(line)
 for key in ("HOST_UID", "HOST_GID", "DOCKER_GID"):
     if key not in seen:
         out.append(f"{key}={updates[key]}")
+for key, (_, new_value) in image_migrations.items():
+    if key not in seen:
+        out.append(f"{key}={new_value}")
 path.write_text("\n".join(out) + "\n", encoding="utf-8")
 PYENV
 fi

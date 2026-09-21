@@ -1,4 +1,6 @@
 build/
+install/
+log/
 .venv/
 __pycache__/
 .pytest_cache/
@@ -6,4 +8,6 @@ __pycache__/
 *.pyc
 .test-results/
 .agent-state/
+.agent-context/
+.agent/work-items/
 compile_commands.json

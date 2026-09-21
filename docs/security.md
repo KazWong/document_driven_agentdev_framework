@@ -2,22 +2,21 @@
 
 ## High-trust boundary
 
-The Docker socket grants the main container effective control over the host daemon. A compromised repository, dependency, agent prompt, or tool can therefore affect the host. Restrict this environment to trusted users and code, keep Docker patched, and do not expose its daemon remotely without an authenticated transport.
+`main-development` mounts the host Docker socket and can therefore instruct the host Docker daemon. It is a high-trust development component. v2.0.2 also grants only `main-development` the outer-container capabilities/security profile required for Codex's nested Bubblewrap sandbox. The temporary auth helper and generic/firmware test services do not inherit that relaxation.
 
 ## Controls
 
-- Main and test processes run as the configured non-root UID/GID.
-- Normal Codex writes are workspace-scoped and network access is disabled.
-- Only the coder role is writable.
-- Automated local commands are argument vectors from an approved manifest and pass an executable/path policy.
-- Automated test lanes never include `compose.hardware.yaml`.
-- `hardwarectl` requires R3, explicit manifest permission, two distinct approvals, a device path, actor, and literal confirmation.
-- Bitbucket API writes require a recorded PR gate and `--execute`.
-- Tokens are read from environment variables and are not placed in `.env` or command arguments.
-- Workflow evidence is preserved and hashed.
+- Development/test images run as the configured non-root user.
+- Codex keeps its own read-only/workspace-write sandbox separation; the sandbox is not disabled.
+- `/usr/local/bin/bwrap` is a compatibility wrapper over the real setuid `/usr/bin/bwrap` and removes only the fresh `--proc /proc` request that the outer container rejects.
+- Work-item documents, plans, approvals, trace, and evidence are project-local operational records and ignored by Git.
+- Framework candidate commits stage only approved source paths and reject empty candidates.
+- Local/integration verification operate on exact detached candidate checkouts, not mutable development state.
+- Required ROS test lanes fail closed on zero/missing executed-test evidence.
+- Automatic SCM publication is limited to the work-item feature branch; no automatic force push or protected-branch write is permitted.
+- GitHub tokens remain in provider credential/environment storage; `GH_TOKEN` is not placed in process argv or `.env`.
+- Merge remains human-gated. Hardware/device exposure remains separately human-authorized and is not enabled by automatic test lanes.
 
 ## Residual risks
 
-An allowlisted build system, compiler, Python test, or repository script can execute arbitrary repository code. The work-item approval therefore authorizes running trusted project tests; it is not a malware sandbox. Generic and firmware tests run in containers, but the main container still controls the host Docker daemon. Use isolated build hosts for untrusted pull requests.
-
-Approval records are audit artifacts, not cryptographic signatures. Protect `.agent-state` with host permissions and backups. Enforce branch restrictions and required CI independently in Bitbucket.
+Docker socket possession remains equivalent to powerful host authority. `seccomp=unconfined`/`apparmor=unconfined` on the main container expands its attack surface and is accepted only to permit the nested Codex sandbox; it must not be copied to auth/test services. Provider credentials can publish feature branches/PRs and must be scoped accordingly. Live Docker/ROS/provider behavior must still be acceptance-tested on the target host because packaging QA cannot emulate the user's daemon, FUSE mount, external ROS bundle, or remote repository policy.

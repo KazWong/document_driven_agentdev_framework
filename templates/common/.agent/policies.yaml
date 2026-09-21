@@ -26,8 +26,9 @@ risk_classes:
     merge_approvals: 2
     hardware_approvals: 2
 immutable_rules:
-  - Agents never push or merge without human authorization.
-  - Agents never create a pull request without the PR gate.
+  - The framework may push only the work-item feature branch and create the configured pull request after candidate, local, integration when required, and review SHAs agree.
+  - Direct writes to protected branches and automatic force-pushes are forbidden.
+  - Merge remains human-gated and must respect repository branch protection.
   - Physical hardware is never exposed to automatic test lanes.
   - A coding agent never performs final review.
   - Evidence and transition history are append-only operational records.

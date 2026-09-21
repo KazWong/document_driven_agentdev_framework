@@ -1,6 +1,6 @@
 # Main robotics AI-agent development environment
 
-Release **2.0.0** implements an **Agent-Gated Software Development Lifecycle** for C, C++, Python, Linux shell, ROS 2, simulation, and firmware work.
+Release **2.0.2** implements an **Agent-Gated Software Development Lifecycle** for C, C++, Python, Linux shell, ROS 2, simulation, and firmware work.
 
 The environment is designed for installation below:
 
@@ -50,7 +50,7 @@ reviewers         generic container       merge / hardware
  evidence index + trace.jsonl + PR package
 ```
 
-The workflow uses one coordinator and one writing agent per worktree. Planning, testing analysis, debugging, review, and safety review are read-only. Agents do not push, create pull requests, merge, flash firmware, expose devices, or command physical motion automatically.
+The workflow uses one coordinator and one writing agent per worktree. Planning, testing analysis, debugging, review, and safety review are read-only. Coding/review agents do not perform SCM or merge actions themselves. After exact-candidate verification and review, the framework may push only the work-item branch and create the configured PR automatically; protected-branch merge, hardware exposure, flashing, and physical motion remain human-controlled.
 
 ## Included components
 
@@ -101,7 +101,7 @@ Extract this bundle and the independent ROS test bundle beneath the required wor
 ```bash
 mkdir -p /home/kazwong/codes/agents/infrastructure
 
-tar -xzf robotics-ai-agent-dev-env-2.0.0.tar.gz \
+tar -xzf robotics-ai-agent-dev-env-2.0.2.tar.gz \
   -C /home/kazwong/codes/agents
 
 tar -xzf ros2-humble-gazebo-test.tar.gz \
@@ -223,110 +223,178 @@ Each generated project contains an initial Git commit, `AGENTS.md`, `.agent` pol
 
 ## Agent-gated workflow
 
-### 1. Create a manifest
+v2.0.2 is **document-driven**. The work-item manifest controls lifecycle, risk, scope, verification, isolation, rollback, and hardware policy. Requirements/design inputs come from documents explicitly imported into the work item; agents must not invent missing requirements.
+
+### 1. Create and register a work item
+
+For ROS 2 and mixed projects, `R2` is the default when `--risk` is omitted. An explicit risk remains supported.
 
 ```bash
 cd /home/kazwong/codes/agents/projects/robot-control
 agentctl init-manifest \
-  --output work-item.yaml \
+  --output /tmp/RBT-123.yaml \
   --id RBT-123 \
-  --title "Add velocity-command watchdog" \
-  --repository projects/robot-control \
-  --kind ros2 \
-  --risk R2
+  --title "Velocity-command watchdog" \
+  --repository . \
+  --kind ros2
+
+agentctl new --prepare-worktree /tmp/RBT-123.yaml
 ```
 
-Edit the generated YAML so scope, acceptance criteria, local commands, integration lanes, rollback, and hardware policy are exact.
+Canonical work-item state is project-local:
 
-### 2. Register and plan
-
-```bash
-agentctl new work-item.yaml
-agentctl run RBT-123
+```text
+projects/robot-control/.agent/work-items/RBT-123/
 ```
 
-The first run invokes the read-only planner and stops at `PLANNED`.
+The development worktree is disposable environment state:
 
-### 3. Approve the plan
+```text
+.agent-state/worktrees/robot-control/RBT-123/
+```
+
+### 2. Import authoritative documents
 
 ```bash
+agentctl update RBT-123 \
+  --document docs/requirements.md \
+  --document docs/architecture.md
+```
+
+Each import becomes an immutable SHA-256-addressed revision. Revise an existing document with:
+
+```bash
+agentctl update RBT-123 \
+  --document docs/requirements-v2.md \
+  --supersedes DOC-001
+```
+
+Old revisions, plans, runs, and evidence are preserved. Changing the active document set invalidates stale current planning/execution bindings and requires replanning.
+
+### 3. Plan and approve
+
+```bash
+agentctl plan RBT-123
+cat .agent/work-items/RBT-123/plans/plan-*.md
+
 agentctl approve RBT-123 plan \
   --actor kazwong \
-  --note "Scope and test matrix approved"
+  --note "Document-bound plan reviewed"
 ```
 
-The approval snapshots the manifest, current Git SHA, and planning artifacts. Each gate is bound to a context digest; changing the plan, pull-request body, CI commit, or hardware context invalidates prior approvals automatically.
+A blocked plan can be retried after correcting its inputs:
 
-### 4. Implement through PR readiness
+```bash
+agentctl plan --retry RBT-123
+```
+
+### 4. Automated implementation, exact-candidate verification, and PR publication
 
 ```bash
 agentctl run RBT-123
 ```
 
-The coordinator then:
+The coordinator performs the following sequence:
 
-1. Creates an isolated branch and Git worktree.
-2. Invokes the single writing `coder` role.
-3. Rejects committed or uncommitted changed paths outside the manifest scope.
-4. Runs allowlisted local commands directly as argument vectors, never through a shell string.
-5. Invokes `tester` against deterministic local evidence.
-6. Runs registered integration lanes through `testctl`.
-7. Invokes `integration_tester` against process results and summaries.
-8. Invokes `safety_reviewer` for R2/R3.
-9. Invokes the independent `reviewer`.
-10. Invokes `review_requester` and stops at `PR_READY`.
+1. invokes the sole writing coder in the work-item branch/worktree;
+2. rejects out-of-scope changes and creates a non-empty framework-owned candidate commit;
+3. verifies the exact candidate from a detached mode-preserving local checkout;
+4. for required integration lanes, verifies the exact candidate from a disposable shared-workspace checkout so `build/`, `install/`, `log/`, and `.test-results/` cannot contaminate the development worktree;
+5. rejects a required `ros2-humble test` lane that executes zero tests, even if its process exits zero;
+6. runs R2/R3 safety review and independent code review against the same candidate;
+7. verifies candidate/local/integration/review SHA equality;
+8. pushes only the work-item feature branch without force and automatically creates the configured GitHub or Bitbucket pull request;
+9. verifies the remote PR head SHA and stops at `PR_OPEN`.
 
-Failures route to `DIAGNOSING`, then the read-only debugger produces a diagnosis. Route it explicitly:
+Inspect code at any time without changing workflow state:
+
+```bash
+agentctl inspect RBT-123 --stat
+```
+
+For a required-integration work item, publication requires:
+
+```text
+candidate_sha
+  == local_test_sha
+  == integration_test_sha
+  == reviewed_sha
+  == pr_head_sha
+```
+
+There is no human gate before PR creation in v2.0.2. The remote PR is the normal human code-review point. Merge remains human-gated.
+
+### 5. Configure GitHub or Bitbucket
+
+Provider configuration is stored in the tracked project `.agent/project.yaml` and managed with `scmctl`:
+
+```bash
+scmctl configure --provider github --remote origin --base-branch main
+scmctl doctor
+```
+
+GitHub uses the official `gh` CLI. Interactive login/configuration persists under `.agent-state/github-cli`:
+
+```bash
+make github-login
+make github-login-status
+```
+
+Headless automation may use `GH_TOKEN`; the framework does not place the token in command-line arguments or `.env`.
+
+Bitbucket remains supported through the same provider-neutral publication path. Existing `bitbucket-pr` remains for compatibility/diagnostics, but normal lifecycle publication is performed by `agentctl run`.
+
+### 6. Diagnose and route failures
+
+Failed activities enter `DIAGNOSING`, then `DIAGNOSED`. Review:
+
+```bash
+agentctl status RBT-123
+cat .agent/work-items/RBT-123/artifacts/diagnosis.md
+```
+
+Route to the smallest valid recovery boundary:
 
 ```bash
 agentctl resolve RBT-123 --route implementation
-# Other routes: plan, local-test, environment, blocked
+# or: plan | local-test | environment | blocked
 ```
 
-### 5. Authorize and create the pull request
+Recovery invalidates only current bindings downstream of the selected boundary; historical commits/evidence remain intact. In particular, `implementation` clears the old current candidate before the coder runs again, `local-test` preserves the candidate, and `environment` preserves the candidate plus successful local-verification SHA.
 
-Dry-run payload generation is always allowed:
+Risk can be escalated without editing state files manually:
 
 ```bash
-bitbucket-pr prepare RBT-123
+agentctl reclassify RBT-123 \
+  --risk R2 \
+  --actor kazwong \
+  --note "ROS behavior requires R2 policy"
 ```
 
-An API write requires a recorded gate and an explicit execution flag:
+Reclassification is one-way in v2.0.2 and requires a fresh plan approval.
 
-```bash
-agentctl approve RBT-123 pr --actor kazwong
-bitbucket-pr create RBT-123 --execute
-```
+### 7. CI, merge approval, promotion, and closure
 
-Authentication is read only from environment variables:
-
-- `BITBUCKET_ACCESS_TOKEN`, or
-- `BITBUCKET_API_TOKEN` together with `BITBUCKET_EMAIL`.
-
-### 6. Record CI and merge approval
+After the remote provider reports CI for the PR candidate:
 
 ```bash
 agentctl record-ci RBT-123 \
   --status passed \
-  --url "https://bitbucket.example/build/123"
+  --url https://ci.example.invalid/build/123 \
+  --commit <candidate-sha>
 
 agentctl approve RBT-123 merge --actor reviewer-a
-agentctl approve RBT-123 merge --actor reviewer-b   # required for R2/R3
+agentctl approve RBT-123 merge --actor reviewer-b   # R2/R3
 ```
 
-The workflow records approval identities separately and does not count duplicate approvals from one actor.
-
-### 7. Promotion and closure
-
-For non-hardware work:
+Repository/provider branch protection performs the actual merge. Promotion remains explicit:
 
 ```bash
-agentctl promote RBT-123 \
-  --level simulation \
-  --evidence "projects/robot-control/.test-results/ros2-humble/simulation/latest.log.summary.json"
-
-agentctl close RBT-123 --actor kazwong --note "Merged and promoted"
+agentctl promote RBT-123 --level simulation --evidence <evidence-path>
+agentctl close RBT-123 --actor kazwong --note "Merged and verified"
 ```
+
+Physical/HIL actions retain their separate hardware authorization requirements.
 
 ## Risk classes
 

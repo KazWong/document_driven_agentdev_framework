@@ -16,12 +16,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang-tidy clang-tools clangd cmake cppcheck curl docker-compose-v2 docker.io \
     file gdb git git-lfs gnupg jq less lcov lldb locales make nano ninja-build \
     openssh-client pkg-config pipx python3 python3-dev python3-jsonschema python3-pip \
-    python3-venv python3-yaml ripgrep rsync shellcheck unzip valgrind vim zip \
+    python3-venv python3-yaml python3-pytest ripgrep rsync shellcheck unzip valgrind vim zip \
+    && chmod u+s /usr/bin/bwrap \
     && locale-gen en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install ruff
+
+RUN mkdir -p -m 755 /etc/apt/keyrings \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install --global "@openai/codex@${CODEX_VERSION}" \
     && npm cache clean --force
+
+COPY scripts/codex-bwrap-compat.sh /usr/local/bin/bwrap
+RUN chmod 0755 /usr/local/bin/bwrap
 
 RUN set -eux; \
     existing_group="$(getent group "${USER_GID}" | cut -d: -f1 || true)"; \
@@ -47,6 +61,7 @@ COPY --chown=${USER_UID}:${USER_GID} scripts/entrypoint.sh /usr/local/bin/roboti
 
 RUN chmod +x /opt/robotics-agent-env/bin/* /opt/robotics-agent-env/docker/generic/generic-test /opt/robotics-agent-env/docker/firmware/firmware-test /usr/local/bin/robotics-agent-entrypoint \
     && ln -s /opt/robotics-agent-env/bin/agentctl /usr/local/bin/agentctl \
+    && ln -s /opt/robotics-agent-env/bin/scmctl /usr/local/bin/scmctl \
     && ln -s /opt/robotics-agent-env/bin/testctl /usr/local/bin/testctl \
     && ln -s /opt/robotics-agent-env/bin/bitbucket-pr /usr/local/bin/bitbucket-pr \
     && ln -s /opt/robotics-agent-env/bin/hardwarectl /usr/local/bin/hardwarectl \
@@ -57,6 +72,7 @@ ENV LANG=en_US.UTF-8 \
     ROBOTICS_AGENT_ENV_ROOT=/opt/robotics-agent-env \
     AGENT_WORKSPACE_ROOT=/home/kazwong/codes/agents \
     AGENT_STATE_ROOT=/home/kazwong/codes/agents/.agent-state \
+    GH_CONFIG_DIR=/home/kazwong/codes/agents/.agent-state/github-cli \
     CODEX_HOME=/home/kazwong/codes/agents/.agent-state/codex-home \
     PYTHONPATH=/opt/robotics-agent-env/src \
     PATH=/opt/robotics-agent-env/bin:/home/kazwong/.local/bin:${PATH}

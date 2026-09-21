@@ -17,10 +17,11 @@ REQUIRED = [
     "compose.hardware.yaml", ".env.example", ".codex/config.toml",
     ".codex/rules/default.rules", "config/test-environments.yaml",
     "config/workflow.yaml", "config/policies.yaml", "bin/agentctl", "bin/testctl",
-    "bin/projectctl", "bin/bitbucket-pr", "bin/hardwarectl",
+    "bin/projectctl", "bin/bitbucket-pr", "bin/hardwarectl", "bin/scmctl", "bin/ros2-docker-compat",
     "docker/main/Dockerfile", "docker/generic/Dockerfile", "docker/firmware/Dockerfile",
     "schemas/work-item.schema.json", "schemas/agent-result.schema.json",
-    "docs/source-reconciliation.md", "scripts/codex-login.sh",
+    "docs/source-reconciliation.md", "docs/agent-branching-policy.md", "docs/todo.md",
+    "scripts/codex-login.sh", "scripts/github-login.sh", "scripts/codex-bwrap-compat.sh",
 ]
 ROLES = {
     "planner", "coder", "tester", "integration_tester", "debugger",
@@ -41,8 +42,8 @@ def main() -> int:
             errors.append(f"missing required file: {relative}")
     checks.append("required files")
 
-    if (root / "VERSION").read_text().strip() != "2.0.1":
-        errors.append("VERSION must be 2.0.1")
+    if (root / "VERSION").read_text().strip() != "2.0.2":
+        errors.append("VERSION must be 2.0.2")
 
     for path in root.rglob("*.json"):
         try:
@@ -84,6 +85,12 @@ def main() -> int:
     main_mounts = services.get("main-development", {}).get("volumes", [])
     if not any(isinstance(mount, dict) and mount.get("source") == "/var/run/docker.sock" for mount in main_mounts):
         errors.append("main-development lacks Docker socket")
+    main = services.get("main-development", {})
+    required_caps = {"SYS_ADMIN", "SYS_CHROOT", "SETUID", "SETGID", "SYS_PTRACE", "NET_ADMIN"}
+    if set(main.get("cap_add", [])) != required_caps:
+        errors.append("main-development nested-sandbox capability profile is incorrect")
+    if set(main.get("security_opt", [])) != {"seccomp=unconfined", "apparmor=unconfined"}:
+        errors.append("main-development nested-sandbox security profile is incorrect")
     auth = services.get("codex-login", {})
     if auth.get("network_mode") != "host":
         errors.append("codex-login must use host networking for localhost OAuth callback")
@@ -110,7 +117,12 @@ def main() -> int:
     ]).lower()
     if "jazzy" in active_text:
         errors.append("active configuration still references Jazzy")
-    checks.append("ROS 2 Humble alignment")
+    workflow = yaml.safe_load((root / "config/workflow.yaml").read_text())
+    if "PR_OPEN" not in workflow.get("states", []) or "PR_READY" in workflow.get("states", []):
+        errors.append("workflow must use PR_OPEN instead of PR_READY for new work")
+    if "PR_READY" in workflow.get("human_gates", {}):
+        errors.append("workflow must not require a human PR-creation gate")
+    checks.append("ROS 2 Humble and automated PR workflow alignment")
 
     agent_files = {path.stem for path in (root / ".codex/agents").glob("*.toml")}
     if agent_files != ROLES:
@@ -128,6 +140,7 @@ def main() -> int:
     executable_candidates = list((root / "bin").glob("*")) + [
         root / "scripts/bootstrap-host.sh", root / "scripts/entrypoint.sh",
         root / "scripts/qa.sh", root / "scripts/package.sh", root / "scripts/codex-login.sh",
+        root / "scripts/github-login.sh", root / "scripts/codex-bwrap-compat.sh",
         root / "docker/generic/generic-test", root / "docker/firmware/firmware-test",
     ]
     for path in executable_candidates:

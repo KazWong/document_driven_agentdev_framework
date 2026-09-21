@@ -49,7 +49,7 @@ isolation:
   strategy: worktree
 human_gates:
   plan_change: required
-  pull_request_creation: required
+  pull_request_creation: automated
   merge: required
   physical_execution: required
 promotion:

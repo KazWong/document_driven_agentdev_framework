@@ -72,9 +72,15 @@ def _build_prompt(item: WorkItem, role: str, context: dict[str, Any] | None) -> 
         path.name: path.read_text(encoding="utf-8")
         for path in sorted(item.artifacts_path.glob("*.md"))
     }
+    active_documents = [
+        {k: d.get(k) for k in ("id", "revision", "filename", "media_type", "size", "sha256")}
+        for d in item.active_documents()
+    ]
     payload = {
         "work_item": item.manifest,
         "workflow_status": item.status,
+        "authoritative_documents": active_documents,
+        "document_context": item.prepare_agent_context(),
         "existing_artifacts": artifacts,
         "deterministic_evidence": _latest_evidence(item),
         "git_context": _git_context(item),
@@ -82,7 +88,7 @@ def _build_prompt(item: WorkItem, role: str, context: dict[str, Any] | None) -> 
     }
     return f"""Execute the '{role}' responsibility for this agent-gated work item.
 
-The work-item manifest is the authoritative scope. Do not silently expand it. Report a required scope change with scope_change=true and decision=blocked. Do not claim tests passed without deterministic evidence from the workflow.
+The imported work-item documents listed under authoritative_documents are the authoritative project inputs. The work-item controls define lifecycle, risk, scope boundaries, and verification policy. Inspect the staged documents under .agent-context/{item.work_id}/documents, including non-text files when your available tools can interpret them. If a required document cannot be interpreted, or documents conflict or omit information needed for a safe executable decision, report the exact problem and block rather than inventing requirements. Do not silently expand scope. Do not claim tests passed without deterministic evidence from the workflow.
 
 Return exactly one JSON object matching the output schema. Put the substantive report in deliverable_markdown. Do not wrap the JSON in Markdown fences.
 
@@ -148,7 +154,13 @@ def dispatch_role(item: WorkItem, role: str, *, context: dict[str, Any] | None =
     item.record_role_run(role, run_dir, result, completed.returncode)
     deliverable = result.get("deliverable_markdown", "").strip()
     if deliverable:
-        item.write_artifact(ROLE_ARTIFACT[role], deliverable)
+        if role == "planner":
+            if result.get("status") == "completed" and result.get("decision") == "pass" and not result.get("scope_change", False):
+                item.write_plan(deliverable)
+            else:
+                item.write_artifact("planning-report.md", deliverable)
+        else:
+            item.write_artifact(ROLE_ARTIFACT[role], deliverable)
     return result
 
 

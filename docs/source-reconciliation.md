@@ -41,3 +41,9 @@ Supported delegated actions are `configure`, `build`, `doctor`, `smoke`, `test`,
 ## Deliberately unsupported inference
 
 No undocumented filenames, implementation details, image layers, or helper behavior from the unavailable 1.0.0 archives were assumed. Where a concrete implementation was necessary, 2.0.0 defines and tests a new explicit contract in this repository.
+
+## v2.0.2 consolidated update
+
+The v2.0.2 release is generated as one patch from the verified v2.0.1 baseline. Earlier incremental v2.0.2 correction patches are superseded by that consolidated patch. The consolidation incorporates the document-driven/project-local work-item design, Codex nested-sandbox fixes, GitHub/Bitbucket provider-neutral PR automation, candidate-SHA integrity model, risk escalation/defaults, local mode-preserving verification, ROS persistent-exec compatibility, integration checkout isolation, positive test-count validation, and recovery-boundary invalidation semantics discovered during real-host acceptance testing.
+
+The ROS package/application test-registration defect observed during acceptance remains a project implementation concern handled by the coder under the approved plan; the framework does not hard-code project-specific package metadata changes.

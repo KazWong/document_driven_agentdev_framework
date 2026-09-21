@@ -8,7 +8,7 @@ states:
   - LOCALLY_VERIFIED
   - ENV_VERIFIED
   - REVIEWED
-  - PR_READY
+  - PR_OPEN
   - CI_VERIFIED
   - MERGE_APPROVED
   - PROMOTED
@@ -16,7 +16,6 @@ states:
 failure_states: [DIAGNOSING, DIAGNOSED, BLOCKED]
 human_gates:
   PLANNED: plan
-  PR_READY: pr
   CI_VERIFIED: merge
   MERGE_APPROVED: hardware-when-required
 roles:

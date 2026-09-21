@@ -39,3 +39,9 @@ The process return code is authoritative. Project test summaries are expected be
 ## Failure behavior
 
 A missing external bundle produces a deterministic integration failure and routes the work item to diagnosis. The coordinator does not install dependencies, rewrite the path, or fall back to a different ROS distribution.
+
+## v2.0.2 persistent-exec compatibility
+
+Some persistent ROS test containers source `/opt/ros/humble/setup.bash` only in their original entrypoint, while later `docker compose exec` processes start without the resulting shell environment. The main framework places a Docker argv compatibility shim in front of the external `ros2-humble` lane only. The shim rewrites only the `docker compose ... exec ... ros2-test-project` process to source `/opt/ros/humble/setup.bash` in that actual exec process; all other Docker invocations are forwarded unchanged.
+
+The framework also rejects a required Humble test action that reports zero executed tests. Successful build/rosdep stages do not substitute for behavior-test evidence.

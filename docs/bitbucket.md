@@ -1,13 +1,12 @@
 # Bitbucket integration
 
-The root Pipeline validates the source tree and generated projects, then builds the three images. A custom self-hosted runner pipeline adds live Docker smoke tests and the external ROS 2 Humble smoke test.
+Bitbucket remains a supported SCM provider in v2.0.2, but normal publication is provider-neutral and driven by `agentctl run` after candidate verification and AI review.
 
-`bitbucket-pr` infers the workspace/repository from common Bitbucket SSH and HTTPS remotes. `prepare` prints a dry-run payload. `create --execute` performs the API write only after `agentctl approve WORK-ID pr`.
-
-After Bitbucket Pipelines finishes, record its immutable build URL and commit:
+Configure a project with:
 
 ```bash
-agentctl record-ci RBT-123 --status passed --url BUILD_URL --commit COMMIT_SHA
+scmctl configure --provider bitbucket --remote origin --base-branch main
+scmctl doctor
 ```
 
-Branch restrictions, required builds, approval counts, unresolved-task checks, and merge permissions must also be configured in Bitbucket. The local workflow does not replace server-side protection.
+Authentication remains environment-based (`BITBUCKET_ACCESS_TOKEN`, or `BITBUCKET_API_TOKEN` with `BITBUCKET_EMAIL`). Credentials are not stored in the project manifest. The compatibility `bitbucket-pr` command remains available for diagnostics/legacy use, but new workflow items do not require a separate human PR-creation approval. Merge remains human-gated.

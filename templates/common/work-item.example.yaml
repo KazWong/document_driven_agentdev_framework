@@ -24,7 +24,7 @@ verification:
 isolation:
   strategy: worktree
 human_gates:
-  pull_request_creation: required
+  pull_request_creation: automated
   merge: required
 promotion:
   physical_hardware: prohibited

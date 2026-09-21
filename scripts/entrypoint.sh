@@ -4,9 +4,9 @@ umask 027
 WORKSPACE="${AGENT_WORKSPACE_ROOT:-/home/kazwong/codes/agents}"
 STATE="${AGENT_STATE_ROOT:-$WORKSPACE/.agent-state}"
 CODEX_DIR="${CODEX_HOME:-$STATE/codex-home}"
-mkdir -p "$WORKSPACE" "$STATE" "$STATE/work-items" "$STATE/worktrees" \
+mkdir -p "$WORKSPACE" "$STATE" "$STATE/index" "$STATE/worktrees" "$STATE/verifiers/integration" \
   "$STATE/cache/ccache" "$STATE/cache/ccache-generic" "$STATE/cache/pip" \
-  "$STATE/cache/platformio" "$STATE/cache/uv" "$CODEX_DIR"
+  "$STATE/cache/platformio" "$STATE/cache/uv" "$STATE/github-cli" "$CODEX_DIR"
 if [[ ! -f "$CODEX_DIR/config.toml" ]]; then
   cp /opt/robotics-agent-env/.codex/config.toml "$CODEX_DIR/config.toml"
 fi
