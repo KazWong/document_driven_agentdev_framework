@@ -186,8 +186,9 @@ def test_workflow_does_not_record_integration_sha_when_zero_tests_run(
     assert workflow.run_next(item) == "DIAGNOSING"
     assert item.status["implementation"]["integration_test_sha"] is None
 
-def test_bootstrap_migrates_only_default_v201_image_tags() -> None:
+def test_bootstrap_delegates_conservative_env_migration() -> None:
     root = Path(__file__).resolve().parents[1]
     text = (root / "scripts" / "bootstrap-host.sh").read_text(encoding="utf-8")
-    assert '"robotics-ai-agent-main:2.0.1", "robotics-ai-agent-main:2.0.2"' in text
-    assert 'new_value if value == old_value else value' in text
+    assert 'VERSION="$(cat "$ROOT/VERSION")"' in text
+    assert 'scripts/update_env.py' in text
+    assert 'robotics-ai-agent-main:$VERSION' in text

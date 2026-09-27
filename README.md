@@ -1,6 +1,6 @@
 # Main robotics AI-agent development environment
 
-Release **2.0.2** implements an **Agent-Gated Software Development Lifecycle** for C, C++, Python, Linux shell, ROS 2, simulation, and firmware work.
+Release **2.0.3** implements an **Agent-Gated Software Development Lifecycle** for C, C++, Python, Linux shell, ROS 2, simulation, and firmware work.
 
 The environment is designed for installation below:
 
@@ -9,6 +9,8 @@ The environment is designed for installation below:
 ```
 
 That directory is bind-mounted at the same absolute path in the main development container and every test container. The main container controls sibling test environments through the host Docker daemon.
+
+Version 2.0.3 is a backward-compatible release-integrity hotfix. It preserves the v2.0.2 lifecycle and schemas while correcting executable Git modes, deterministic packaging, release hygiene/provenance, and conservative 2.0.x image-tag migration.
 
 ## What changed from 1.0.0
 
@@ -101,7 +103,7 @@ Extract this bundle and the independent ROS test bundle beneath the required wor
 ```bash
 mkdir -p /home/kazwong/codes/agents/infrastructure
 
-tar -xzf robotics-ai-agent-dev-env-2.0.2.tar.gz \
+tar -xzf robotics-ai-agent-dev-env-2.0.3.tar.gz \
   -C /home/kazwong/codes/agents
 
 tar -xzf ros2-humble-gazebo-test.tar.gz \

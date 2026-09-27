@@ -2,6 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE=/home/kazwong/codes/agents
+VERSION="$(cat "$ROOT/VERSION")"
 case "$ROOT" in
   "$WORKSPACE"/*) ;;
   *) printf 'bootstrap-host: install this repository under %s before bootstrapping\n' "$WORKSPACE" >&2; exit 2 ;;
@@ -21,51 +22,18 @@ else
   docker_gid="$gid"
 fi
 if [[ ! -f "$ENV_FILE" ]]; then
-  cat > "$ENV_FILE" <<EOF
+  cat > "$ENV_FILE" <<EOF_ENV
 HOST_UID=$uid
 HOST_GID=$gid
 DOCKER_GID=$docker_gid
 DEV_USERNAME=kazwong
 CODEX_VERSION=latest
-MAIN_IMAGE=robotics-ai-agent-main:2.0.2
-GENERIC_IMAGE=robotics-ai-agent-generic-test:2.0.2
-FIRMWARE_IMAGE=robotics-ai-agent-firmware-test:2.0.2
-EOF
+MAIN_IMAGE=robotics-ai-agent-main:$VERSION
+GENERIC_IMAGE=robotics-ai-agent-generic-test:$VERSION
+FIRMWARE_IMAGE=robotics-ai-agent-firmware-test:$VERSION
+EOF_ENV
 else
-  python3 - "$ENV_FILE" "$uid" "$gid" "$docker_gid" <<'PYENV'
-from pathlib import Path
-import sys
-path = Path(sys.argv[1])
-updates = {"HOST_UID": sys.argv[2], "HOST_GID": sys.argv[3], "DOCKER_GID": sys.argv[4]}
-image_migrations = {
-    "MAIN_IMAGE": ("robotics-ai-agent-main:2.0.1", "robotics-ai-agent-main:2.0.2"),
-    "GENERIC_IMAGE": ("robotics-ai-agent-generic-test:2.0.1", "robotics-ai-agent-generic-test:2.0.2"),
-    "FIRMWARE_IMAGE": ("robotics-ai-agent-firmware-test:2.0.1", "robotics-ai-agent-firmware-test:2.0.2"),
-}
-lines = path.read_text(encoding="utf-8").splitlines()
-seen = set()
-out = []
-for line in lines:
-    if "=" in line and not line.lstrip().startswith("#"):
-        key, value = line.split("=", 1)
-        if key in updates:
-            out.append(f"{key}={updates[key]}")
-            seen.add(key)
-            continue
-        if key in image_migrations:
-            old_value, new_value = image_migrations[key]
-            out.append(f"{key}={new_value if value == old_value else value}")
-            seen.add(key)
-            continue
-    out.append(line)
-for key in ("HOST_UID", "HOST_GID", "DOCKER_GID"):
-    if key not in seen:
-        out.append(f"{key}={updates[key]}")
-for key, (_, new_value) in image_migrations.items():
-    if key not in seen:
-        out.append(f"{key}={new_value}")
-path.write_text("\n".join(out) + "\n", encoding="utf-8")
-PYENV
+  python3 "$ROOT/scripts/update_env.py" "$ENV_FILE" "$uid" "$gid" "$docker_gid" "$VERSION"
 fi
 chmod 600 "$ENV_FILE"
 AGENT_WORKSPACE_ROOT="$WORKSPACE" CODEX_HOME="$WORKSPACE/.agent-state/codex-home" "$ROOT/scripts/sync-codex-config.sh"

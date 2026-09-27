@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.0.3 — 2026-09-25
+
+### Added
+
+- Deterministic release packaging from the committed Git tree, with source commit/tree provenance and archive self-verification.
+- Source-versus-release validation modes, complete release-manifest verification, and committed executable-mode checks.
+- Conservative `.env` migration tests covering the 2.0.0, 2.0.1, and 2.0.2 default image tags while preserving custom image settings.
+- Release-integrity regression tests for archive reproducibility, runtime-state exclusion, dirty-source rejection, and executable Git modes.
+
+### Changed
+
+- Release archives use the canonical `robotics-ai-agent-dev-env` name regardless of the checkout directory name.
+- `scripts/qa.sh` derives the release number from `VERSION` instead of hard-coding it.
+- Packaging excludes the legacy tracked `.env` through Git export attributes and ignores local runtime state by construction.
+
+### Fixed
+
+- Operational entrypoints were recorded as non-executable (`100644`) in Git; all required command/test/bootstrap scripts are now committed as `100755`.
+- `scripts/sync-codex-config.sh` is now included in executable-mode validation.
+- Release packaging no longer captures `.git`, ignored agent/work-item state, credentials, caches, or other untracked working-tree content.
+- ZIP artifacts are reproducible for the same source commit, and TAR packaging no longer uses a hard-coded historical timestamp.
+- Bootstrap upgrades known default 2.0.0/2.0.1/2.0.2 image tags to 2.0.3 without changing custom image references.
+
 ## 2.0.2 — 2026-09-20
 
 ### Added

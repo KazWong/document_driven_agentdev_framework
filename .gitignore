@@ -11,3 +11,6 @@ __pycache__/
 /.agent/locks/
 /.agent/tmp/
 /.agent-context/
+/.test-results/
+
+/dist/

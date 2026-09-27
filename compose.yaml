@@ -9,7 +9,7 @@ x-workspace-volume: &workspace
 
 services:
   main-development:
-    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.2}
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.3}
     build:
       context: .
       dockerfile: docker/main/Dockerfile
@@ -56,7 +56,7 @@ services:
 
   codex-login:
     profiles: ["auth"]
-    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.2}
+    image: ${MAIN_IMAGE:-robotics-ai-agent-main:2.0.3}
     build:
       context: .
       dockerfile: docker/main/Dockerfile
@@ -86,7 +86,7 @@ services:
 
   generic-test:
     profiles: ["test"]
-    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.2}
+    image: ${GENERIC_IMAGE:-robotics-ai-agent-generic-test:2.0.3}
     build:
       context: .
       dockerfile: docker/generic/Dockerfile
@@ -111,7 +111,7 @@ services:
 
   firmware-test:
     profiles: ["test"]
-    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.2}
+    image: ${FIRMWARE_IMAGE:-robotics-ai-agent-firmware-test:2.0.3}
     build:
       context: .
       dockerfile: docker/firmware/Dockerfile
