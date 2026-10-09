@@ -1,0 +1,1665 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ai-agent-framework:v2.1:draft-contracts:1",
+  "title": "Proposed v2.1 semantic and record contracts; NOT installed runtime policy",
+  "$defs": {
+    "Reference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "Element": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Requirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "required",
+            "approved_deferred",
+            "approved_not_applicable"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "disposition"
+      ],
+      "additionalProperties": false
+    },
+    "VerificationObligation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "required"
+      ],
+      "additionalProperties": false
+    },
+    "EnvironmentRequirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "object"
+        },
+        "selection_authority": {
+          "enum": [
+            "user",
+            "delegated_planner",
+            "proposed_in_this_ecp"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "capability",
+        "provider_ref",
+        "constraints",
+        "selection_authority"
+      ],
+      "additionalProperties": false
+    },
+    "Blueprint": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "artifact_type": {
+          "const": "blueprint"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "status": {
+          "enum": [
+            "proposal",
+            "draft"
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Requirement"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Element"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Element"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "verification_obligations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VerificationObligation"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "traceability": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+              },
+              "design_elements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "verifications": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "requirement",
+              "design_elements",
+              "verifications"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "environment_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EnvironmentRequirement"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "final_acceptance": {
+          "type": "object",
+          "properties": {
+            "obligations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "required_environments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "obligations",
+            "required_environments"
+          ],
+          "additionalProperties": false
+        },
+        "lineage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operation": {
+                "enum": [
+                  "preserve",
+                  "proposed_materialization",
+                  "split",
+                  "merge",
+                  "retire"
+                ]
+              }
+            },
+            "required": [
+              "ids",
+              "source",
+              "operation"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "artifact_type",
+        "project_id",
+        "status",
+        "requirements",
+        "components",
+        "interfaces",
+        "verification_obligations",
+        "traceability",
+        "environment_requirements",
+        "final_acceptance",
+        "lineage"
+      ],
+      "additionalProperties": false
+    },
+    "Permissions": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "enum": [
+            "none",
+            "approved_external"
+          ]
+        },
+        "host_filesystem": {
+          "enum": [
+            "none",
+            "declared_read_only_inputs"
+          ]
+        },
+        "physical_hardware": {
+          "type": "boolean"
+        },
+        "physical_motion": {
+          "type": "boolean"
+        },
+        "device_write": {
+          "type": "boolean"
+        },
+        "host_privilege": {
+          "type": "boolean"
+        },
+        "external_destructive_write": {
+          "type": "boolean"
+        },
+        "credentials": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "network",
+        "host_filesystem",
+        "physical_hardware",
+        "physical_motion",
+        "device_write",
+        "host_privilege",
+        "external_destructive_write",
+        "credentials"
+      ],
+      "additionalProperties": false
+    },
+    "Provider": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "provider_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_version": {
+          "const": 1
+        },
+        "project_source_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "requirement_schema": {
+          "type": "object"
+        },
+        "resolver_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bootstrap_requires": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "environment_contract_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "acceptance_contract_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "argv": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              },
+              "timeout_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "permissions": {
+                "$ref": "#/$defs/Permissions"
+              },
+              "result_schema_ref": {
+                "$ref": "#/$defs/Reference"
+              }
+            },
+            "required": [
+              "id",
+              "argv",
+              "timeout_seconds",
+              "permissions",
+              "result_schema_ref"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "provider_id",
+        "provider_version",
+        "contract_version",
+        "project_source_sha",
+        "artifact_digest",
+        "capabilities",
+        "requirement_schema",
+        "resolver_action",
+        "bootstrap_requires",
+        "environment_contract_ref",
+        "acceptance_contract_ref",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "ProviderResult": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "provider_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "environment_generation": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+        },
+        "environment_artifact_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "suite_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "obligation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "candidate_failed",
+            "environment_failure",
+            "provider_failure",
+            "bootstrap_failure",
+            "test_failure",
+            "unsupported_requirement",
+            "transient_failure",
+            "unknown_failure"
+          ]
+        },
+        "candidate_evaluated": {
+          "type": "boolean"
+        },
+        "test_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "failure_stage": {
+          "enum": [
+            "none",
+            "prepare",
+            "execute",
+            "collect",
+            "classify"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "candidate_sha",
+        "provider_digest",
+        "environment_generation",
+        "environment_artifact_digest",
+        "suite_digest",
+        "obligation_ids",
+        "status",
+        "candidate_evaluated",
+        "test_count",
+        "evidence",
+        "failure_stage"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "passed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "candidate_evaluated": {
+                "const": true
+              },
+              "test_count": {
+                "minimum": 1
+              },
+              "evidence": {
+                "minItems": 1
+              },
+              "failure_stage": {
+                "const": "none"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "environment_failure",
+                  "bootstrap_failure",
+                  "unsupported_requirement"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "candidate_evaluated": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "candidate_failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "candidate_evaluated": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TestDesign": {
+      "type": "object",
+      "properties": {
+        "artifact_type": {
+          "const": "test_design"
+        },
+        "role": {
+          "const": "tester"
+        },
+        "blueprint_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "obligations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "development_cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "independent_cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "allocation_rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "no_new_acceptance_criteria": {
+          "const": true
+        }
+      },
+      "required": [
+        "artifact_type",
+        "role",
+        "blueprint_ref",
+        "obligations",
+        "development_cases",
+        "independent_cases",
+        "allocation_rationale",
+        "no_new_acceptance_criteria"
+      ],
+      "additionalProperties": false
+    },
+    "PlannerOutput": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "planner"
+        },
+        "artifact_type": {
+          "const": "planning"
+        },
+        "blueprint_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "plan_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "requirement_reconciliation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "blueprint_ref",
+        "plan_ref",
+        "requirement_reconciliation",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "TesterPreflight": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "tester"
+        },
+        "artifact_type": {
+          "const": "testability"
+        },
+        "test_design_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "feasible": {
+          "type": "boolean"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "test_design_ref",
+        "feasible",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "CoderPreflight": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "coder"
+        },
+        "artifact_type": {
+          "const": "implementation_feasibility"
+        },
+        "package_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "handoff_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "feasible": {
+          "type": "boolean"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "package_ref",
+        "handoff_ref",
+        "feasible",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "ImplementationTrace": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "coder"
+        },
+        "artifact_type": {
+          "const": "implementation_trace"
+        },
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "package_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requirement_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "design_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "task_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "path",
+              "requirement_ids",
+              "design_ids",
+              "task_ids"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "incomplete_obligations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "candidate_sha",
+        "package_ref",
+        "changes",
+        "incomplete_obligations"
+      ],
+      "additionalProperties": false
+    },
+    "TesterVerdict": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "tester"
+        },
+        "artifact_type": {
+          "const": "verification"
+        },
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "result_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "obligation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "verdict": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_evaluated"
+          ]
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "candidate_sha",
+        "result_refs",
+        "obligation_ids",
+        "verdict"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewerVerdict": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "reviewer"
+        },
+        "artifact_type": {
+          "const": "review"
+        },
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "package_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "verdict": {
+          "enum": [
+            "approved",
+            "changes_required",
+            "blocked"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "failure_class": {
+          "enum": [
+            "candidate_failed",
+            "test_failure",
+            "environment_failure",
+            "provider_failure",
+            "bootstrap_failure",
+            "unsupported_requirement",
+            "transient_failure",
+            "unknown_failure"
+          ]
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "candidate_sha",
+        "package_ref",
+        "verdict",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "SafetyVerdict": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "safety_reviewer"
+        },
+        "artifact_type": {
+          "const": "safety_review"
+        },
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "package_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "verdict": {
+          "enum": [
+            "approved",
+            "changes_required",
+            "blocked"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "failure_class": {
+          "enum": [
+            "candidate_failed",
+            "test_failure",
+            "environment_failure",
+            "provider_failure",
+            "bootstrap_failure",
+            "unsupported_requirement",
+            "transient_failure",
+            "unknown_failure"
+          ]
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "candidate_sha",
+        "package_ref",
+        "verdict",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "Diagnosis": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "debugger"
+        },
+        "artifact_type": {
+          "const": "diagnosis"
+        },
+        "failure_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "owner": {
+          "enum": [
+            "coder",
+            "tester",
+            "planner",
+            "environment_project",
+            "provider_project",
+            "bootstrap",
+            "human"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "failure_ref",
+        "owner",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "RoleOutput": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/PlannerOutput"
+        },
+        {
+          "$ref": "#/$defs/TesterPreflight"
+        },
+        {
+          "$ref": "#/$defs/CoderPreflight"
+        },
+        {
+          "$ref": "#/$defs/ImplementationTrace"
+        },
+        {
+          "$ref": "#/$defs/TesterVerdict"
+        },
+        {
+          "$ref": "#/$defs/ReviewerVerdict"
+        },
+        {
+          "$ref": "#/$defs/SafetyVerdict"
+        },
+        {
+          "$ref": "#/$defs/Diagnosis"
+        },
+        {
+          "$ref": "#/$defs/PlanningDraft"
+        },
+        {
+          "$ref": "#/$defs/TestDesignDraft"
+        }
+      ]
+    },
+    "EvidenceBinding": {
+      "type": "object",
+      "properties": {
+        "candidate_sha": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "package_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "suite_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "environment_generations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "result_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "purpose": {
+          "enum": [
+            "targeted",
+            "final_acceptance",
+            "environment_acceptance"
+          ]
+        },
+        "execution_kind": {
+          "const": "provider_environment"
+        },
+        "input_digests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "candidate_sha",
+        "package_ref",
+        "suite_ref",
+        "environment_generations",
+        "result_refs",
+        "purpose",
+        "execution_kind",
+        "input_digests"
+      ],
+      "additionalProperties": false
+    },
+    "DependencyEdge": {
+      "type": "object",
+      "properties": {
+        "upstream": {
+          "$ref": "#/$defs/Reference"
+        },
+        "downstream": {
+          "$ref": "#/$defs/Reference"
+        },
+        "relation": {
+          "enum": [
+            "derived_from",
+            "implements",
+            "verifies",
+            "constrains",
+            "executes_on",
+            "materialized_from",
+            "generated_from",
+            "approved_as_part_of"
+          ]
+        }
+      },
+      "required": [
+        "upstream",
+        "downstream",
+        "relation"
+      ],
+      "additionalProperties": false
+    },
+    "ArtifactRecord": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "identity": {
+          "$ref": "#/$defs/Reference"
+        },
+        "owner": {
+          "enum": [
+            "planner",
+            "coder",
+            "tester",
+            "reviewer",
+            "safety_reviewer",
+            "debugger",
+            "framework",
+            "human"
+          ]
+        },
+        "payload_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "parent_revisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "payload": {
+          "type": "object"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "identity",
+        "owner",
+        "payload_digest",
+        "parent_revisions",
+        "payload",
+        "source_refs"
+      ],
+      "additionalProperties": false
+    },
+    "ChangePackage": {
+      "type": "object",
+      "properties": {
+        "artifact_type": {
+          "const": "engineering_change_package"
+        },
+        "request_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "blueprint_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "plan_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "provider_feasibility_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "tester_feasibility_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "coder_feasibility_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "policy_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "test_design_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "scope_include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "scope_exclude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "permissions": {
+          "$ref": "#/$defs/Permissions"
+        },
+        "risk_class": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3"
+          ]
+        },
+        "delivery": {
+          "enum": [
+            "artifact",
+            "scm"
+          ]
+        },
+        "known_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "artifact_type",
+        "request_refs",
+        "blueprint_ref",
+        "plan_ref",
+        "provider_feasibility_ref",
+        "tester_feasibility_ref",
+        "coder_feasibility_ref",
+        "policy_ref",
+        "test_design_ref",
+        "scope_include",
+        "scope_exclude",
+        "permissions",
+        "risk_class",
+        "delivery",
+        "known_constraints"
+      ],
+      "additionalProperties": false
+    },
+    "Plan": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1
+              },
+              "design": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "requirements",
+              "design",
+              "paths"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "include": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "include",
+            "exclude"
+          ],
+          "additionalProperties": false
+        },
+        "risk_class": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3"
+          ]
+        },
+        "permissions": {
+          "$ref": "#/$defs/Permissions"
+        },
+        "delivery": {
+          "enum": [
+            "artifact",
+            "scm"
+          ]
+        },
+        "scm": {
+          "type": "object",
+          "properties": {
+            "base_branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required_checks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "base_branch",
+            "required_checks"
+          ],
+          "additionalProperties": false
+        },
+        "environment_release": {
+          "type": "object",
+          "properties": {
+            "provider_contract": {
+              "type": "object"
+            },
+            "environment_contract": {
+              "type": "object"
+            },
+            "acceptance_action": {
+              "type": "object",
+              "properties": {
+                "argv": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "timeout_seconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                },
+                "permissions": {
+                  "$ref": "#/$defs/Permissions"
+                }
+              },
+              "required": [
+                "argv",
+                "timeout_seconds",
+                "permissions"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "provider_contract",
+            "environment_contract",
+            "acceptance_action"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "tasks",
+        "scope",
+        "risk_class",
+        "permissions",
+        "delivery"
+      ],
+      "additionalProperties": false
+    },
+    "PlanningDraft": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "planner"
+        },
+        "artifact_type": {
+          "const": "planning_draft"
+        },
+        "blueprint": {
+          "$ref": "#/$defs/Blueprint"
+        },
+        "plan": {
+          "$ref": "#/$defs/Plan"
+        },
+        "consequences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "blueprint",
+        "plan",
+        "consequences"
+      ],
+      "additionalProperties": false
+    },
+    "TestDesignDraft": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "tester"
+        },
+        "artifact_type": {
+          "const": "test_design_draft"
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "visibility": {
+                "enum": [
+                  "development",
+                  "independent"
+                ]
+              },
+              "obligations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{1,95}$"
+                },
+                "minItems": 1
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "path",
+              "visibility",
+              "obligations",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "allocation_rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "role",
+        "artifact_type",
+        "cases",
+        "allocation_rationale"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Blueprint"
+    },
+    {
+      "$ref": "#/$defs/Provider"
+    },
+    {
+      "$ref": "#/$defs/ProviderResult"
+    },
+    {
+      "$ref": "#/$defs/TestDesign"
+    },
+    {
+      "$ref": "#/$defs/RoleOutput"
+    },
+    {
+      "$ref": "#/$defs/EvidenceBinding"
+    },
+    {
+      "$ref": "#/$defs/DependencyEdge"
+    },
+    {
+      "$ref": "#/$defs/ArtifactRecord"
+    },
+    {
+      "$ref": "#/$defs/ChangePackage"
+    }
+  ]
+}

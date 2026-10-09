@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="580" viewBox="0 0 1290 580" role="img">
+<title>Artifact dependency graph</title>
+<rect width="100%" height="100%" fill="#101824"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#809bb9"/></marker></defs>
+<text x="30" y="33" font-family="sans-serif" font-size="21" fill="#fff">Overview · 12 shown · 988 omitted</text>
+<text x="30" y="58" font-family="sans-serif" font-size="12" fill="#a5b5c9">Prerequisite → dependent. Green: CURRENT · Amber: STALE · Red: INVALID. Use a focused query for omitted nodes.</text>
+<path d="M140,155 C140,175 140,175 140,195" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,155 C140,175 390,175 390,195" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,155 C140,175 640,175 640,195" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,260 C140,280 140,280 140,300" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,260 C140,280 390,280 390,300" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,260 C140,280 640,280 640,300" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M140,260 C140,280 390,385 390,405" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M390,260 C390,280 890,280 890,300" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M390,260 C390,280 1140,280 1140,300" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M390,260 C390,280 140,385 140,405" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<path d="M390,260 C390,280 640,385 640,405" stroke="#809bb9" fill="none" marker-end="url(#arrow)"/>
+<g><rect x="30" y="90" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000000</title>
+<text x="40" y="114" font-family="monospace" font-size="12" fill="#fff">NODE-00000000</text>
+<text x="40" y="136" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="30" y="195" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000010</title>
+<text x="40" y="219" font-family="monospace" font-size="12" fill="#fff">NODE-00000010</text>
+<text x="40" y="241" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="280" y="195" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000011</title>
+<text x="290" y="219" font-family="monospace" font-size="12" fill="#fff">NODE-00000011</text>
+<text x="290" y="241" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="530" y="195" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000012</title>
+<text x="540" y="219" font-family="monospace" font-size="12" fill="#fff">NODE-00000012</text>
+<text x="540" y="241" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="30" y="300" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000040</title>
+<text x="40" y="324" font-family="monospace" font-size="12" fill="#fff">NODE-00000040</text>
+<text x="40" y="346" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="280" y="300" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000041</title>
+<text x="290" y="324" font-family="monospace" font-size="12" fill="#fff">NODE-00000041</text>
+<text x="290" y="346" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="530" y="300" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000042</title>
+<text x="540" y="324" font-family="monospace" font-size="12" fill="#fff">NODE-00000042</text>
+<text x="540" y="346" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="780" y="300" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000043</title>
+<text x="790" y="324" font-family="monospace" font-size="12" fill="#fff">NODE-00000043</text>
+<text x="790" y="346" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="1030" y="300" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000044</title>
+<text x="1040" y="324" font-family="monospace" font-size="12" fill="#fff">NODE-00000044</text>
+<text x="1040" y="346" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="30" y="405" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000045</title>
+<text x="40" y="429" font-family="monospace" font-size="12" fill="#fff">NODE-00000045</text>
+<text x="40" y="451" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="280" y="405" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000050</title>
+<text x="290" y="429" font-family="monospace" font-size="12" fill="#fff">NODE-00000050</text>
+<text x="290" y="451" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+<g><rect x="530" y="405" width="225" height="65" rx="8" fill="#855e19" stroke="#aec1d6"/><title>NODE-00000055</title>
+<text x="540" y="429" font-family="monospace" font-size="12" fill="#fff">NODE-00000055</text>
+<text x="540" y="451" font-family="sans-serif" font-size="11" fill="#e6eff8">r1 · STALE · framework</text></g>
+</svg>

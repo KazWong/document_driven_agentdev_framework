@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "artifact_type": "blueprint",
+  "project_id": "PROJ-FW",
+  "status": "draft",
+  "requirements": [
+    {
+      "id": "REQ-FW-001",
+      "text": "Core must remain technology-neutral; adding a new software technology must not require technology-name branches in generic core lifecycle logic.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-002",
+      "text": "New project creation must be neutral; Planner defines repository architecture from requirements rather than a language/project-type generator.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-003",
+      "text": "Every project must use a Planner-owned ProjectBlueprint separate from the Plan, with stable requirement/component/interface/verification identities and end-to-end requirements traceability.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-004",
+      "text": "Provider must be a thin modular technology contract defining capabilities, compatibility, environment requirements, acceptance, permissions, actions, and normalized outcomes rather than a second lifecycle engine.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-005",
+      "text": "Provider/test environments must be framework-managed projects supporting compatible environment families and immutable verified generations.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-006",
+      "text": "Material deployment/test/runtime target decisions are user-authoritative; Planner may choose only when delegated and must document the exact choice/rationale.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-007",
+      "text": "Provider/Tester/Coder feasibility failures must route to targeted Planner replanning without downstream improvisation; a Planner replan after human approval requires a revised approval package and human reapproval.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-008",
+      "text": "Provider/environment failure must remain distinct from candidate/project failure and must not create false evidence against the candidate.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-009",
+      "text": "Core/bootstrap must remain small, acyclic, and depend on generic environment build/run primitives rather than a technology-specific provider or permanent Docker-specific contract.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-010",
+      "text": "Framework-created projects that remain in service must have an explicit compatibility/migration path; historical work-item data may use a deterministic conversion tool.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-011",
+      "text": "User semantic edits to an approval package/project knowledge must create a new unapproved revision and rerun affected validation/feasibility before approval.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-012",
+      "text": "The framework repository itself must be developed and updated through the same ProjectBlueprint, traceability, feasibility, approval, candidate, verification, and promotion discipline, with an independent recovery boundary.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-013",
+      "text": "Providers originate only from framework/user-managed provider projects; no external provider catalog/store is trusted. A locally promoted provider may be installed/activated automatically for an approved capability requirement, while creating a missing provider requires human-approved architectural work.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-014",
+      "text": "Required verification must run through the approved Blueprint-bound provider/environment capability; incidental tools in the framework control plane may provide advisory self-tests only.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-015",
+      "text": "Shared environment generations are immutable and space-aware: project dependencies execute in approved isolated overlays, heavy artifacts are garbage-collected by policy, and durable generation/evidence identity survives artifact eviction.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-016",
+      "text": "Project/provider execution must use the generic environment backend with immutable/read-only candidate input and isolated writable outputs; provider/domain code must not bypass it to gain undeclared host/container privileges.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-017",
+      "text": "Role behavior must be enforced by role-specific context/permission/output/workflow contracts, and Tester-to-Coder handoff must expose all approved requirements while retaining a meaningful independent verification subset (approximately 30% of concrete test information by default) outside Coder context.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-018",
+      "text": "Artifact validity/traceability must use an explicit typed dependency DAG with targeted stale propagation and immutable historical revisions/evidence; Project Baselines/savepoints must bound the normal active working graph without deleting traceability.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-019",
+      "text": "The framework must make dependency state understandable and scalable through static graph/subgraph visualization in v2.1, future-compatible canonical graph APIs, and measured performance/storage behavior across large synthetic graphs and archived history.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-020",
+      "text": "Tester owns development-facing regression tests materialized into the product repository and independent tests stored in framework-managed project knowledge; unilateral Coder test changes are blocked, and provider/environment acceptance tests remain separate.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-021",
+      "text": "Every promotion requires a project-defined Final Acceptance Suite drawn from existing VER-* obligations, executed for the exact candidate SHA and required environment generations after prerequisite verification and review.",
+      "disposition": "required"
+    },
+    {
+      "id": "REQ-FW-022",
+      "text": "Debugger is an on-demand read-only diagnosis role for ambiguous, conflicting, or repeated failures; clear ownership routes directly and a diagnosis grants no approval authority.",
+      "disposition": "required"
+    }
+  ],
+  "components": [
+    {
+      "id": "CMP-FW-PROJECT-KNOWLEDGE",
+      "text": "Maintain requirements, ProjectBlueprint revisions, stable IDs, design artifacts, and project-level authoritative knowledge."
+    },
+    {
+      "id": "CMP-FW-PLANNING",
+      "text": "Produce/revise Blueprint and Plan, reconcile feasibility findings with requirements, and prepare approval-ready engineering change packages."
+    },
+    {
+      "id": "CMP-FW-TRACEABILITY",
+      "text": "Maintain requirement -> design -> implementation -> verification -> evidence links and validate trace completeness."
+    },
+    {
+      "id": "CMP-FW-PROVIDER-SYSTEM",
+      "text": "Discover/resolve locally promoted provider contracts and expose technology capabilities/compatibility without embedding domain control flow in core."
+    },
+    {
+      "id": "CMP-FW-ENVIRONMENT-MANAGER",
+      "text": "Resolve/reuse/create/update provider environment families, generations, overlays, and environment-project work."
+    },
+    {
+      "id": "CMP-FW-WORKFLOW",
+      "text": "Own lifecycle state, targeted replanning routing, candidate identity, failure ownership, and resume behavior."
+    },
+    {
+      "id": "CMP-FW-APPROVAL",
+      "text": "Build/version Engineering Change Packages, invalidate stale approval, present semantic diffs, and enforce human gates."
+    },
+    {
+      "id": "CMP-FW-EXECUTION-BACKEND",
+      "text": "Provide generic environment build/run/mount/evidence primitives independent of provider technology and initially implementable with Docker."
+    },
+    {
+      "id": "CMP-FW-EVIDENCE",
+      "text": "Bind normalized verification/environment evidence to candidate and environment identities and preserve audit history."
+    },
+    {
+      "id": "CMP-FW-MIGRATION",
+      "text": "Convert supported historical work-item/project metadata and preserve/report provenance without inventing ambiguous data."
+    },
+    {
+      "id": "CMP-FW-SELF-DEVELOPMENT",
+      "text": "Apply the framework lifecycle to the framework repository while preserving stable-controller/recovery separation."
+    },
+    {
+      "id": "CMP-FW-ARTIFACT-GRAPH",
+      "text": "Maintain typed artifact dependencies, validity state, baseline/savepoint frontiers, historical archive references, graph queries, compaction, and explanatory graph projections."
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "IFACE-FW-BLUEPRINT",
+      "text": "Canonical ProjectBlueprint schema plus stable identity/lineage/traceability semantics."
+    },
+    {
+      "id": "IFACE-FW-APPROVAL-PACKAGE",
+      "text": "Revisioned Engineering Change Package joining requirements, Blueprint, Plan, feasibility, scope, verification and risk/permission facts."
+    },
+    {
+      "id": "IFACE-FW-PROVIDER",
+      "text": "Versioned provider capability/requirement/compatibility/bootstrap/acceptance/action/result contract."
+    },
+    {
+      "id": "IFACE-FW-ENVIRONMENT-BACKEND",
+      "text": "Generic build/run/input-mount/output/evidence/artifact identity interface used by environment projects/providers."
+    },
+    {
+      "id": "IFACE-FW-EVIDENCE",
+      "text": "Normalized candidate/environment/action/result/failure-owner evidence envelope."
+    },
+    {
+      "id": "IFACE-FW-ROLE-RESULTS",
+      "text": "Role-specific feasibility/artifact/verdict/diagnostic contracts; must not force incompatible roles into one generic pass/fail semantic."
+    },
+    {
+      "id": "IFACE-FW-ARTIFACT-GRAPH",
+      "text": "Canonical typed graph/query/action contract used by lifecycle logic, CLI/static rendering, and future VS Code visualization/control surfaces."
+    }
+  ],
+  "verification_obligations": [
+    {
+      "id": "VER-FW-001",
+      "text": "Synthetic unknown provider works end-to-end without adding its technology name/special-case branch to generic core.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-002",
+      "text": "Small project preserves complete `REQ-* -> CMP/IFACE -> implementation -> VER-* -> evidence` traceability.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-003",
+      "text": "Multi-component project supports targeted replan/invalidation while preserving unaffected traceable artifacts.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-004",
+      "text": "User edit of an approval package makes it unapproved, reruns affected feasibility, preserves managed IDs/lineage, and requires explicit final approval.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-005",
+      "text": "Post-approval Coder/Tester/Provider finding that causes Planner replan produces a new approval package revision and blocks implementation until human reapproval.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-006",
+      "text": "Missing provider environment can be created as a framework-managed environment project from lower-level bootstrap capabilities and then used for project verification.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-007",
+      "text": "Incompatible environment variants coexist as separate families; compatible projects reuse promoted generations without in-place mutation.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-008",
+      "text": "Controlled environment failure is classified as environment failure, preserves the application candidate, repairs via environment-project lifecycle, and re-verifies the same candidate where source is unchanged.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-009",
+      "text": "Core QA passes with optional technology providers absent and detects reintroduced domain-specific core hardcoding.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-010",
+      "text": "Framework self-change follows its own requirements/Blueprint/feasibility/approval/implementation/evidence flow while the accepted framework remains recoverable.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-011",
+      "text": "Framework architecture release is rejected when current ProjectBlueprint/traceability and implemented architecture materially disagree.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-012",
+      "text": "Supported older framework-created project can be maintained/migrated without requiring obsolete project-type classification.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-013",
+      "text": "Project requiring a locally promoted provider automatically activates/installs it and creates/reuses its environment without external provider retrieval; a genuinely missing provider blocks on an approved provider-project change.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-014",
+      "text": "Required verification cannot be satisfied by an incidental compatible tool in `main-development`; the bound provider/environment execution and exact environment generation are recorded in evidence.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-015",
+      "text": "Disk-pressure cleanup removes overlays/caches/eligible heavy environment artifacts in policy order while preserving promoted active environment integrity and durable generation/provenance/evidence records.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-016",
+      "text": "Authoritative verification cannot modify the candidate worktree; writes occur only in isolated backend-managed state and undeclared direct privileged backend escape is rejected/detected.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-017",
+      "text": "Role-enforcement acceptance proves Coder cannot access retained independent test artifacts through normal role context, receives all approval-bound acceptance requirements, cannot satisfy a Tester verdict with a Coder artifact, and independent tests remain traceable to existing `VER-*` obligations without introducing hidden requirements.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-018",
+      "text": "Targeted invalidation acceptance proves an upstream change stales only declared descendants, preserves unaffected current artifacts, explains the dependency path, and creates/restores a Project Baseline whose compaction/archive preserves historical traceability.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-019",
+      "text": "Graph scalability/visualization acceptance exercises approximately 1k/10k/100k-node synthetic graphs plus large archived history, measures traversal/stale/cycle/baseline/archive/render/memory/storage behavior, and verifies static focused views are produced from the canonical graph without requiring all nodes to be rendered at once.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-020",
+      "text": "Verify Tester-owned repository test materialization, blocked Coder edits, isolation of independent test source and logs, and separate provider/environment acceptance storage.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-021",
+      "text": "Reject promotion with missing, failed, stale, wrong-candidate, wrong-suite, wrong-environment, or incomplete required-matrix Final Acceptance evidence; permit only exact current passing bindings.",
+      "required": true
+    },
+    {
+      "id": "VER-FW-022",
+      "text": "Route clear candidate/test/environment/architecture failures directly; invoke Debugger for ambiguous/conflicting/repeated failures; reject diagnosis as a verification or approval artifact.",
+      "required": true
+    }
+  ],
+  "traceability": [
+    {
+      "requirement": "REQ-FW-001",
+      "design_elements": [
+        "CMP-FW-PROVIDER-SYSTEM",
+        "CMP-FW-WORKFLOW",
+        "IFACE-FW-PROVIDER"
+      ],
+      "verifications": [
+        "VER-FW-001",
+        "VER-FW-009"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-002",
+      "design_elements": [
+        "CMP-FW-PROJECT-KNOWLEDGE",
+        "CMP-FW-PLANNING",
+        "IFACE-FW-BLUEPRINT"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-003",
+      "design_elements": [
+        "CMP-FW-PROJECT-KNOWLEDGE",
+        "CMP-FW-TRACEABILITY",
+        "IFACE-FW-BLUEPRINT"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-004",
+      "design_elements": [
+        "CMP-FW-PROVIDER-SYSTEM",
+        "IFACE-FW-PROVIDER"
+      ],
+      "verifications": [
+        "VER-FW-001",
+        "VER-FW-009"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-005",
+      "design_elements": [
+        "CMP-FW-ENVIRONMENT-MANAGER",
+        "CMP-FW-EXECUTION-BACKEND",
+        "IFACE-FW-ENVIRONMENT-BACKEND"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-007",
+        "VER-FW-008"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-006",
+      "design_elements": [
+        "CMP-FW-PLANNING",
+        "CMP-FW-APPROVAL",
+        "IFACE-FW-APPROVAL-PACKAGE"
+      ],
+      "verifications": [
+        "VER-FW-004"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-007",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "CMP-FW-PLANNING",
+        "CMP-FW-APPROVAL"
+      ],
+      "verifications": [
+        "VER-FW-003",
+        "VER-FW-005"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-008",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "CMP-FW-EVIDENCE",
+        "IFACE-FW-EVIDENCE"
+      ],
+      "verifications": [
+        "VER-FW-008"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-009",
+      "design_elements": [
+        "CMP-FW-EXECUTION-BACKEND",
+        "CMP-FW-PROVIDER-SYSTEM",
+        "IFACE-FW-ENVIRONMENT-BACKEND"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-009"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-010",
+      "design_elements": [
+        "CMP-FW-MIGRATION",
+        "CMP-FW-PROJECT-KNOWLEDGE"
+      ],
+      "verifications": [
+        "VER-FW-012"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-011",
+      "design_elements": [
+        "CMP-FW-APPROVAL",
+        "CMP-FW-PROJECT-KNOWLEDGE",
+        "IFACE-FW-APPROVAL-PACKAGE"
+      ],
+      "verifications": [
+        "VER-FW-004"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-012",
+      "design_elements": [
+        "CMP-FW-SELF-DEVELOPMENT",
+        "CMP-FW-TRACEABILITY",
+        "CMP-FW-APPROVAL"
+      ],
+      "verifications": [
+        "VER-FW-010",
+        "VER-FW-011"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-013",
+      "design_elements": [
+        "CMP-FW-PROVIDER-SYSTEM",
+        "CMP-FW-APPROVAL",
+        "IFACE-FW-PROVIDER"
+      ],
+      "verifications": [
+        "VER-FW-013"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-014",
+      "design_elements": [
+        "CMP-FW-EXECUTION-BACKEND",
+        "CMP-FW-EVIDENCE",
+        "IFACE-FW-ENVIRONMENT-BACKEND"
+      ],
+      "verifications": [
+        "VER-FW-014",
+        "VER-FW-016"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-015",
+      "design_elements": [
+        "CMP-FW-ENVIRONMENT-MANAGER",
+        "CMP-FW-EVIDENCE",
+        "IFACE-FW-ENVIRONMENT-BACKEND"
+      ],
+      "verifications": [
+        "VER-FW-015"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-016",
+      "design_elements": [
+        "CMP-FW-EXECUTION-BACKEND",
+        "CMP-FW-WORKFLOW",
+        "IFACE-FW-ENVIRONMENT-BACKEND"
+      ],
+      "verifications": [
+        "VER-FW-016"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-017",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "CMP-FW-TRACEABILITY",
+        "IFACE-FW-ROLE-RESULTS"
+      ],
+      "verifications": [
+        "VER-FW-017"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-018",
+      "design_elements": [
+        "CMP-FW-ARTIFACT-GRAPH",
+        "CMP-FW-TRACEABILITY",
+        "CMP-FW-WORKFLOW",
+        "IFACE-FW-ARTIFACT-GRAPH"
+      ],
+      "verifications": [
+        "VER-FW-018"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-019",
+      "design_elements": [
+        "CMP-FW-ARTIFACT-GRAPH",
+        "CMP-FW-EVIDENCE",
+        "IFACE-FW-ARTIFACT-GRAPH"
+      ],
+      "verifications": [
+        "VER-FW-019"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-020",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "CMP-FW-PROJECT-KNOWLEDGE",
+        "CMP-FW-TRACEABILITY",
+        "IFACE-FW-ROLE-RESULTS"
+      ],
+      "verifications": [
+        "VER-FW-020"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-021",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "CMP-FW-EVIDENCE",
+        "IFACE-FW-EVIDENCE"
+      ],
+      "verifications": [
+        "VER-FW-021"
+      ]
+    },
+    {
+      "requirement": "REQ-FW-022",
+      "design_elements": [
+        "CMP-FW-WORKFLOW",
+        "IFACE-FW-ROLE-RESULTS"
+      ],
+      "verifications": [
+        "VER-FW-022"
+      ]
+    }
+  ],
+  "environment_requirements": [
+    {
+      "id": "ENVREQ-FW-BOOTSTRAP",
+      "capability": "framework-bootstrap",
+      "provider_ref": "framework-bootstrap-provider@release-approved-digest",
+      "constraints": {
+        "host_platform": "linux",
+        "architecture": "amd64",
+        "backend": "docker"
+      },
+      "selection_authority": "proposed_in_this_ecp"
+    }
+  ],
+  "final_acceptance": {
+    "obligations": [
+      "VER-FW-001",
+      "VER-FW-002",
+      "VER-FW-004",
+      "VER-FW-008",
+      "VER-FW-014",
+      "VER-FW-016",
+      "VER-FW-018",
+      "VER-FW-021"
+    ],
+    "required_environments": [
+      "ENVREQ-FW-BOOTSTRAP"
+    ]
+  },
+  "lineage": [
+    {
+      "ids": [
+        "REQ-FW-001",
+        "REQ-FW-002",
+        "REQ-FW-003",
+        "REQ-FW-004",
+        "REQ-FW-005",
+        "REQ-FW-006",
+        "REQ-FW-007",
+        "REQ-FW-008",
+        "REQ-FW-009",
+        "REQ-FW-010",
+        "REQ-FW-011",
+        "REQ-FW-012",
+        "REQ-FW-013",
+        "REQ-FW-014",
+        "REQ-FW-015",
+        "REQ-FW-016",
+        "REQ-FW-017",
+        "REQ-FW-018",
+        "REQ-FW-019",
+        "VER-FW-001",
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-004",
+        "VER-FW-005",
+        "VER-FW-006",
+        "VER-FW-007",
+        "VER-FW-008",
+        "VER-FW-009",
+        "VER-FW-010",
+        "VER-FW-011",
+        "VER-FW-012",
+        "VER-FW-013",
+        "VER-FW-014",
+        "VER-FW-015",
+        "VER-FW-016",
+        "VER-FW-017",
+        "VER-FW-018",
+        "VER-FW-019"
+      ],
+      "source": "uploaded framework-project-blueprint.md",
+      "operation": "preserve"
+    },
+    {
+      "ids": [
+        "REQ-FW-020",
+        "REQ-FW-021",
+        "REQ-FW-022",
+        "VER-FW-020",
+        "VER-FW-021",
+        "VER-FW-022"
+      ],
+      "source": "approved D-041/D-042/D-043; missing definitions reconstructed explicitly",
+      "operation": "proposed_materialization"
+    }
+  ]
+}

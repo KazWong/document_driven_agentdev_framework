@@ -1,0 +1,12 @@
+flowchart TD
+    H[Host / execution backend] --> C[Minimal framework core]
+    C --> G[Generic environment build/run capability]
+    G --> A[Provider environment A]
+    G --> B[Provider environment B]
+    A --> AR[Domain/runtime capability A]
+    B --> BR[Domain/runtime capability B]
+    AR --> AH[Optional hardware/HIL capability]
+    B --> BH[Optional specialized capability]
+
+    classDef rule stroke-width:2px;
+    G:::rule

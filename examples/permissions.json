@@ -1,0 +1,10 @@
+{
+  "network": "none",
+  "host_filesystem": "declared_read_only_inputs",
+  "physical_hardware": false,
+  "physical_motion": false,
+  "device_write": false,
+  "host_privilege": false,
+  "external_destructive_write": false,
+  "credentials": []
+}

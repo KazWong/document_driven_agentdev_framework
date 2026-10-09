@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "release_status": "candidate_not_promoted",
+  "baseline_sha": "29c44e74ad6e60dc298adbfa60b7402f5ce1b196",
+  "requirements": [
+    {
+      "requirement": "REQ-FW-001",
+      "modules": [
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/contracts.py"
+      ],
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_extended_gates.py"
+      ],
+      "tasks": [
+        "TASK-FW-005",
+        "TASK-FW-009"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-002",
+      "modules": [
+        "src/agent_framework/cli.py",
+        "src/agent_framework/engine.py"
+      ],
+      "host_test_files": [
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-008"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-003",
+      "modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-002",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-004",
+      "modules": [
+        "src/agent_framework/environments.py",
+        "src/agent_framework/contracts.py"
+      ],
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_lifecycle.py",
+        "tests/test_generic_provider.py"
+      ],
+      "tasks": [
+        "TASK-FW-005"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-005",
+      "modules": [
+        "src/agent_framework/environments.py",
+        "src/agent_framework/engine.py"
+      ],
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_environments.py"
+      ],
+      "tasks": [
+        "TASK-FW-005"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-006",
+      "modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-005"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-007",
+      "modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py"
+      ],
+      "host_test_files": [
+        "tests/test_recovery_authoring.py",
+        "tests/test_lifecycle.py"
+      ],
+      "tasks": [
+        "TASK-FW-006",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-008",
+      "modules": [
+        "src/agent_framework/execution.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-005",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-009",
+      "modules": [
+        "src/agent_framework/execution.py",
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py"
+      ],
+      "host_test_files": [
+        "tests/test_execution.py",
+        "tests/test_environments.py",
+        "tests/test_release.py",
+        "tests/test_generic_provider.py"
+      ],
+      "tasks": [
+        "TASK-FW-004",
+        "TASK-FW-009"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-010",
+      "modules": [
+        "src/agent_framework/migration.py",
+        "src/agent_framework/cli.py"
+      ],
+      "host_test_files": [
+        "tests/test_migration_cli.py"
+      ],
+      "tasks": [
+        "TASK-FW-001",
+        "TASK-FW-008"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-011",
+      "modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/store.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_store.py"
+      ],
+      "tasks": [
+        "TASK-FW-002",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-012",
+      "modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ],
+      "host_test_files": [
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ],
+      "tasks": [
+        "TASK-FW-001",
+        "TASK-FW-002",
+        "TASK-FW-009",
+        "TASK-FW-010"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-013",
+      "modules": [
+        "src/agent_framework/environments.py"
+      ],
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_environments.py"
+      ],
+      "tasks": [
+        "TASK-FW-005"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-014",
+      "modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/execution.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_extended_gates.py",
+        "tests/test_generic_provider.py"
+      ],
+      "tasks": [
+        "TASK-FW-004",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-015",
+      "modules": [
+        "src/agent_framework/environments.py",
+        "src/agent_framework/docker_backend.py"
+      ],
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py"
+      ],
+      "tasks": [
+        "TASK-FW-005"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-016",
+      "modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py"
+      ],
+      "host_test_files": [
+        "tests/test_execution.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-004"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-017",
+      "modules": [
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py",
+        "src/agent_framework/policy.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_extended_gates.py"
+      ],
+      "tasks": [
+        "TASK-FW-002",
+        "TASK-FW-006"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-018",
+      "modules": [
+        "src/agent_framework/store.py",
+        "src/agent_framework/graph.py"
+      ],
+      "host_test_files": [
+        "tests/test_store.py",
+        "tests/test_extended_gates.py"
+      ],
+      "tasks": [
+        "TASK-FW-003",
+        "TASK-FW-008"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-019",
+      "modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ],
+      "host_test_files": [
+        "tests/test_store.py"
+      ],
+      "tasks": [
+        "TASK-FW-003",
+        "TASK-FW-008",
+        "TASK-FW-010"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-020",
+      "modules": [
+        "src/agent_framework/test_artifacts.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/engine.py"
+      ],
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_recovery_authoring.py"
+      ],
+      "tasks": [
+        "TASK-FW-006"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-021",
+      "modules": [
+        "src/agent_framework/engine.py"
+      ],
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_extended_gates.py",
+        "tests/test_generic_provider.py"
+      ],
+      "tasks": [
+        "TASK-FW-007",
+        "TASK-FW-010"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    },
+    {
+      "requirement": "REQ-FW-022",
+      "modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/roles.py"
+      ],
+      "host_test_files": [
+        "tests/test_recovery_authoring.py",
+        "tests/test_lifecycle.py"
+      ],
+      "tasks": [
+        "TASK-FW-006",
+        "TASK-FW-007"
+      ],
+      "status": "implemented_host_coverage_live_acceptance_pending"
+    }
+  ],
+  "measurements": [
+    "scripts/benchmark_graph.py",
+    "config/performance-budgets.json"
+  ],
+  "authority_note": "Implementation and host-test mapping is not independent role execution, FAS evidence or human release approval."
+}

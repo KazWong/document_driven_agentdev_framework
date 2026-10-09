@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
-set -euo pipefail
-ROOT="${ROBOTICS_AGENT_ENV_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-export ROBOTICS_AGENT_ENV_ROOT="$ROOT"
-export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
-exec python3 -m robotics_agent_env.scm_cli "$@"
+#!/usr/bin/env python3
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from agent_framework.cli import main
+raise SystemExit(main())

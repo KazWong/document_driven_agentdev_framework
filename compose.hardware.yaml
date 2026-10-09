@@ -1,8 +1,0 @@
-# Human-operated overlay only. hardwarectl validates the R3 hardware gate before using it.
-services:
-  firmware-test:
-    devices:
-      - "${FIRMWARE_DEVICE:?Set FIRMWARE_DEVICE to an explicitly authorized device}:${FIRMWARE_DEVICE}"
-    group_add:
-      - "${FIRMWARE_DEVICE_GID:?Set FIRMWARE_DEVICE_GID from the authorized device}"
-    cap_drop: []

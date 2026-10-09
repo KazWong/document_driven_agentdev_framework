@@ -1,0 +1,780 @@
+{
+  "schema_version": 1,
+  "status": "implementation_coverage_not_independent_acceptance",
+  "allocation_note": "Visibility labels plan coverage areas only; human review sees this entire file. Concrete independent case construction will be generated and isolated in the actual Tester workflow, not copied from a shared Coder-visible package. Ratio is not a mechanical gate.",
+  "cases": [
+    {
+      "id": "T-001",
+      "title": "Executable baseline and patch modes",
+      "verification_ids": [
+        "VER-FW-012"
+      ],
+      "scenario": "Fresh source retains modes; commands run directly. Clear a required execute bit in Git and reject release tree.",
+      "executor": "git_and_filesystem",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_migration_cli.py"
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "Authority and traceability reconciliation",
+      "verification_ids": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011"
+      ],
+      "scenario": "43 decisions match latest approvals; 22 REQ/VER definitions, unique IDs, explicit 020–022 provenance, no contradictory role/FAS status. Remove one required link and reject readiness.",
+      "executor": "schema_and_source",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-003",
+      "title": "Unknown capability without core editing",
+      "verification_ids": [
+        "VER-FW-001",
+        "VER-FW-009",
+        "VER-FW-013"
+      ],
+      "scenario": "Create a synthetic provider with a previously unseen capability string and run an approved project through it. Core source remains byte-identical; absence of provider blocks with an owner-specific finding.",
+      "executor": "real_provider_backend",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-004",
+      "title": "Neutral project and legacy preservation",
+      "verification_ids": [
+        "VER-FW-002",
+        "VER-FW-012"
+      ],
+      "scenario": "Create neutral project with no implicit toolchain. Migrate representative v2.0.3 C/C++/Python/shell source trees without changing product files or inferring an unapproved target.",
+      "executor": "git_and_filesystem",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-005",
+      "title": "Requirement reconciliation and actual diff",
+      "verification_ids": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-005",
+        "VER-FW-011"
+      ],
+      "scenario": "Exercise small and multi-component plans. Remove an original requirement, forge an ID, omit changed paths, traverse outside scope, and reject each. A valid complete mapping succeeds.",
+      "executor": "controller_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-006",
+      "title": "ECP edits and reapproval",
+      "verification_ids": [
+        "VER-FW-004",
+        "VER-FW-005"
+      ],
+      "scenario": "Change Blueprint, Plan, threshold, target or permission after approval. Old approval is stale, unaffected history preserved, affected feasibility reruns, and Coder cannot start before explicit new approval.",
+      "executor": "controller_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-007",
+      "title": "Single policy authority and role removal",
+      "verification_ids": [
+        "VER-FW-009",
+        "VER-FW-017",
+        "VER-FW-022"
+      ],
+      "scenario": "No active transitions require removed roles. A generated prompt/schema/role-config drift fails QA. Coder verdict cannot satisfy Tester/reviewer gates.",
+      "executor": "controller_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-008",
+      "title": "Provider/environment bootstrap",
+      "verification_ids": [
+        "VER-FW-006",
+        "VER-FW-009",
+        "VER-FW-013"
+      ],
+      "scenario": "Clean host with only trusted bootstrap builds a missing environment as a managed project. Reject direct/indirect bootstrap cycles and requiring a previous same-family generation. Missing novel provider requires approved provider-project work.",
+      "executor": "docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-009",
+      "title": "Compatibility and concurrent reuse",
+      "verification_ids": [
+        "VER-FW-007",
+        "VER-FW-015"
+      ],
+      "scenario": "Two incompatible families coexist; compatible projects share one immutable generation with isolated outputs. Two concurrent missing-family requests deduplicate the build work item.",
+      "executor": "docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py"
+      ]
+    },
+    {
+      "id": "T-010",
+      "title": "Approved overlays and immutable generations",
+      "verification_ids": [
+        "VER-FW-007",
+        "VER-FW-015",
+        "VER-FW-016"
+      ],
+      "scenario": "Declared dependencies install only into isolated overlays. Undeclared dependency install, mutation of promoted artifact, or project-to-project output sharing is rejected.",
+      "executor": "docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-011",
+      "title": "Environment failure and repair",
+      "verification_ids": [
+        "VER-FW-008",
+        "VER-FW-014"
+      ],
+      "scenario": "Break environment preparation, retain candidate SHA, record not evaluated, create repair work, promote compatible generation only after its own gates, then rerun original candidate. No application reapproval solely for a compatible generation repair.",
+      "executor": "docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-012",
+      "title": "Role filesystem boundaries",
+      "verification_ids": [
+        "VER-FW-017",
+        "VER-FW-020"
+      ],
+      "scenario": "Attempt retained-test read via normal context, logs, symlinks, Git common directory, absolute paths and controller store. Attempt Coder writes to tracked Tester files and approvals, Tester production writes, and socket access. All denied; required public acceptance criteria remain visible.",
+      "executor": "real_role_sandbox",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-013",
+      "title": "Tester materialization and independent visibility",
+      "verification_ids": [
+        "VER-FW-017",
+        "VER-FW-020"
+      ],
+      "scenario": "Tester writes approved test bundle; controller materializes only allowed test paths and binds hashes. Human can inspect independent cases. Coder sees development subset and all VER thresholds, never independent case bodies or revealing logs. Test corrections changing requirements trigger replan.",
+      "executor": "real_role_sandbox",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-014",
+      "title": "Backend-stamped exact evidence",
+      "verification_ids": [
+        "VER-FW-014",
+        "VER-FW-016",
+        "VER-FW-021"
+      ],
+      "scenario": "Wrong candidate, provider, artifact digest, environment, suite or obligation result is rejected. Direct host test PASS cannot satisfy required provider verification. Zero tests, duplicate/missing matrix cells, invalid result schema and timeout cannot pass.",
+      "executor": "backend_and_controller",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-015",
+      "title": "Candidate mutation and process cleanup",
+      "verification_ids": [
+        "VER-FW-016"
+      ],
+      "scenario": "Read-only/COW candidate is unchanged after hostile test writes and subprocess forks. Cancellation/timeout cleans whole execution and collects bounded evidence. Collection rejects path traversal, external symlinks and oversized outputs.",
+      "executor": "docker_host",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-016",
+      "title": "Disk-pressure GC and lease races",
+      "verification_ids": [
+        "VER-FW-015"
+      ],
+      "scenario": "Evict caches/eligible artifacts in policy order, protect promoted/pinned/leased artifacts, preserve immutable provenance/evidence. Missing heavy artifact reports unavailable and creates a rebuild; never silently binds a new digest to old generation.",
+      "executor": "docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py"
+      ]
+    },
+    {
+      "id": "T-017",
+      "title": "Acyclic approval/test dependency semantics",
+      "verification_ids": [
+        "VER-FW-003",
+        "VER-FW-004",
+        "VER-FW-018",
+        "VER-FW-021"
+      ],
+      "scenario": "Reject self/indirect/same-batch cycles. Show complete Blueprint→ECP→approval→candidate→evidence path. Concrete suite correction with identical approved obligations reruns evidence without architecture reapproval; threshold change requires it.",
+      "executor": "graph_and_controller",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-018",
+      "title": "Targeted invalidation equivalence",
+      "verification_ids": [
+        "VER-FW-003",
+        "VER-FW-018"
+      ],
+      "scenario": "Change one upstream revision in disjoint and reconverging DAGs; compare affected set with an independent reference traversal. Unaffected nodes stay current; historical records are byte-identical; witness path names cause/owner.",
+      "executor": "graph_reference_oracle",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-019",
+      "title": "Baseline, compaction and recovery",
+      "verification_ids": [
+        "VER-FW-018",
+        "VER-FW-019"
+      ],
+      "scenario": "Compare reachability/invalidation before and after compaction; preserve alive bridge dependencies. Restore/query history by ID+revision; refuse baseline during unresolved work. Corrupt/remove/truncate packs and inject crash before/after publish/commit; no lost history or silent approval rewind.",
+      "executor": "storage_fault_injection",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-020",
+      "title": "Readiness without circular gate",
+      "verification_ids": [
+        "VER-FW-021"
+      ],
+      "scenario": "FAS can start with prerequisite evidence/reviews current and its own results absent. Unrelated archived stale nodes do not block; a blocking prerequisite does.",
+      "executor": "controller_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py"
+      ]
+    },
+    {
+      "id": "T-021",
+      "title": "Final acceptance and promotion matrix",
+      "verification_ids": [
+        "VER-FW-021"
+      ],
+      "scenario": "Every new SHA executes FAS; all required environments pass exact current suite; optional entries do not block. Change candidate/suite/environment/approval after readiness and race promotion; stale transaction fails. Old PASS never relabeled.",
+      "executor": "controller_and_docker",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py"
+      ]
+    },
+    {
+      "id": "T-022",
+      "title": "Failure ownership and loop guard",
+      "verification_ids": [
+        "VER-FW-008",
+        "VER-FW-022"
+      ],
+      "scenario": "Clear implementation/test/environment/architecture failure routes directly. Ambiguous/conflicting/repeated equivalent failure invokes read-only Debugger. Default zero automatic retries; configured finite budget exhausts to BLOCKED; diagnosis cannot approve or change code.",
+      "executor": "controller_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-023",
+      "title": "Concurrent record writes and tamper evidence",
+      "verification_ids": [
+        "VER-FW-004",
+        "VER-FW-018"
+      ],
+      "scenario": "Competing approvals/revisions have one valid state transition; reject stale expected revision and duplicate/replayed result. Detect modified payload/hash mismatch and recover interrupted writes without referencing missing objects.",
+      "executor": "storage_fault_injection",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-024",
+      "title": "Measured graph scale",
+      "verification_ids": [
+        "VER-FW-019"
+      ],
+      "scenario": "Exercise 1k/10k/100k nodes with chain, star, diamond and sparse deterministic random DAGs; archive 1m revisions. Measure load/save, lookup, traversal, stale/cycle, baseline/restore/query/render, wall time, p50/p95, peak RSS and sizes. Sample correctness against separate oracle at each tier.",
+      "executor": "benchmark_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_store.py"
+      ],
+      "measurement": "release report: hash-bound 1k/10k/100k graphs and 1,000,000-revision history"
+    },
+    {
+      "id": "T-025",
+      "title": "Static explanatory graph views",
+      "verification_ids": [
+        "VER-FW-018",
+        "VER-FW-019"
+      ],
+      "scenario": "Render canonical filtered overview/requirements/verification/work-item/failure/environment/approval/baseline views, escaped labels and distinct validity/result states. Indicate truncation and allow focused query; never imply truncated output is complete.",
+      "executor": "renderer_and_visual_inspection",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-026",
+      "title": "Managed framework self-change",
+      "verification_ids": [
+        "VER-FW-010",
+        "VER-FW-011"
+      ],
+      "scenario": "Accepted controller orchestrates isolated candidate; exact approved Blueprint/Plan and diff trace exist; candidate cannot promote itself. Inject failed migration/update and recover original controller/config/source with independent procedure.",
+      "executor": "independent_controller_host",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-027",
+      "title": "Actual agent lifecycle",
+      "verification_ids": [
+        "VER-FW-005",
+        "VER-FW-017",
+        "VER-FW-020",
+        "VER-FW-022"
+      ],
+      "scenario": "Run real configured Planner/Tester/Coder/Reviewer plus conditional Safety/Debugger through approved small-project lifecycle. Typed output rejection, context isolation and no-approval refusal exercised without mocked Codex.",
+      "executor": "authenticated_agent_host",
+      "planned_visibility": "independent",
+      "status": "blocked_authenticated_live_agent_unavailable",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py"
+      ]
+    },
+    {
+      "id": "T-028",
+      "title": "Migration and restart",
+      "verification_ids": [
+        "VER-FW-012"
+      ],
+      "scenario": "Dry-run creates no mutation; backup and integrity manifest precede apply; multiple old work-item states and missing evidence yield explicit dispositions. Interrupted conversion resumes/rolls back idempotently; old controller remains usable.",
+      "executor": "filesystem_fault_injection",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_migration_cli.py"
+      ]
+    },
+    {
+      "id": "T-029",
+      "title": "Patch and environment release integrity",
+      "verification_ids": [
+        "VER-FW-009",
+        "VER-FW-010",
+        "VER-FW-011",
+        "VER-FW-012",
+        "VER-FW-014"
+      ],
+      "scenario": "Clean base plus binary Git patch equals packaged candidate tree and modes. Repeated archives match. Secret/runtime-state scan passes; clean Docker builds and bootstrap/smoke/provider isolation run from extracted delivery. Record exact image digests; no untested v2.1 release PASS.",
+      "executor": "release_and_docker_host",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_environments.py",
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_release.py"
+      ]
+    },
+    {
+      "id": "T-030",
+      "title": "Human-readable CLI and safe document reading",
+      "verification_ids": [
+        "VER-FW-002",
+        "VER-FW-018",
+        "VER-FW-019"
+      ],
+      "scenario": "Default output names candidate/environment/owner/action and explains blockers; --json validates. Show approved documents and evidence, refuse traversal/escape, never expose retained test details to Coder context.",
+      "executor": "cli_integration",
+      "planned_visibility": "development",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_migration_cli.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    },
+    {
+      "id": "T-031",
+      "title": "Risk and permission derivation",
+      "verification_ids": [
+        "VER-FW-004",
+        "VER-FW-014",
+        "VER-FW-016",
+        "VER-FW-017"
+      ],
+      "scenario": "Identical consequences yield identical gates regardless of provider name. Unknown permission denied; escalation invalidates affected approval; device/host privilege cannot be self-granted by provider or agent. Merge/hardware counts remain enforced.",
+      "executor": "controller_and_sandbox",
+      "planned_visibility": "independent",
+      "status": "host_coverage_available_independent_acceptance_not_established",
+      "evidence_required": [
+        "exact_candidate_or_input_identity",
+        "execution_identity_and_versions",
+        "command_and_exit_or_assertion_result",
+        "logs_or_object_digests"
+      ],
+      "negative_cases_required": true,
+      "host_test_files": [
+        "tests/test_execution.py",
+        "tests/test_extended_gates.py",
+        "tests/test_lifecycle.py",
+        "tests/test_recovery_authoring.py",
+        "tests/test_store.py"
+      ]
+    }
+  ]
+}

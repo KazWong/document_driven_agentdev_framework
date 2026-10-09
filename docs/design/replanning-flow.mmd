@@ -1,0 +1,19 @@
+flowchart TD
+    U[User request + authoritative documents] --> P[Planner]
+    P --> B[Blueprint / Plan]
+    B --> PF[Provider feasibility]
+    B --> T[Testability / test design]
+    PF --> CF[Coder feasibility]
+    T --> CF
+    CF -->|feasible| I[Implementation]
+    CF -->|plan element infeasible| R[Targeted replan request]
+    PF -->|unsupported / incompatible| R
+    T -->|untestable / ambiguous| R
+    R --> P2[Planner revises affected elements]
+    P2 --> A[Revised Engineering Change Package + human reapproval]
+    A --> PF
+    I --> C[Candidate SHA]
+    C --> V[Verification]
+    V -->|candidate failure| D[Coder / debugger]
+    V -->|environment failure| E[Environment project repair/update]
+    E --> V

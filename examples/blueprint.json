@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "artifact_type": "blueprint",
+  "project_id": "PROJECT-EXAMPLE",
+  "status": "draft",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "Emit the approved message without modifying inputs.",
+      "disposition": "required"
+    }
+  ],
+  "components": [
+    {
+      "id": "CMP-001",
+      "text": "Message component"
+    }
+  ],
+  "interfaces": [],
+  "verification_obligations": [
+    {
+      "id": "VER-001",
+      "text": "Verify exact output and unchanged input files.",
+      "required": true
+    }
+  ],
+  "traceability": [
+    {
+      "requirement": "REQ-001",
+      "design_elements": [
+        "CMP-001"
+      ],
+      "verifications": [
+        "VER-001"
+      ]
+    }
+  ],
+  "environment_requirements": [
+    {
+      "id": "ENVREQ-001",
+      "capability": "python-tests",
+      "provider_ref": "generic",
+      "constraints": {
+        "platform": "linux",
+        "architecture": "amd64"
+      },
+      "selection_authority": "user"
+    }
+  ],
+  "final_acceptance": {
+    "obligations": [
+      "VER-001"
+    ],
+    "required_environments": [
+      "ENVREQ-001"
+    ]
+  },
+  "lineage": []
+}

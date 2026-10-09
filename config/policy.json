@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "roles": {
+    "planner": {
+      "product": "read_only",
+      "role_outputs": [
+        "planning_draft",
+        "planning"
+      ],
+      "independent_tests": "none",
+      "forbidden": [
+        "production_write",
+        "test_implementation_write",
+        "approve",
+        "scm_write"
+      ]
+    },
+    "coder": {
+      "product": "approved_paths_except_tester_owned",
+      "role_outputs": [
+        "implementation_feasibility",
+        "implementation_trace"
+      ],
+      "independent_tests": "none",
+      "forbidden": [
+        "tester_owned_write",
+        "approval_state_write",
+        "scm_write",
+        "authoritative_verdict"
+      ]
+    },
+    "tester": {
+      "product": "read_only",
+      "role_outputs": [
+        "test_design_draft",
+        "testability",
+        "test_design",
+        "verification"
+      ],
+      "independent_tests": "owned_role_artifact_store",
+      "forbidden": [
+        "production_write",
+        "new_acceptance_criterion",
+        "approve",
+        "scm_write"
+      ]
+    },
+    "reviewer": {
+      "product": "read_only",
+      "role_outputs": [
+        "review"
+      ],
+      "independent_tests": "read_only_on_demand",
+      "forbidden": [
+        "product_write",
+        "approve_human_gate",
+        "scm_write"
+      ]
+    },
+    "safety_reviewer": {
+      "product": "read_only",
+      "role_outputs": [
+        "safety_review"
+      ],
+      "independent_tests": "read_only_on_demand",
+      "forbidden": [
+        "product_write",
+        "approve_human_gate",
+        "scm_write"
+      ]
+    },
+    "debugger": {
+      "product": "read_only",
+      "role_outputs": [
+        "diagnosis"
+      ],
+      "independent_tests": "read_only_when_needed",
+      "forbidden": [
+        "product_write",
+        "test_write",
+        "approve",
+        "scm_write"
+      ]
+    }
+  },
+  "removed_roles": [
+    "review_requester",
+    "integration_tester"
+  ],
+  "default_execution_permissions": {
+    "network": "none",
+    "host_filesystem": "declared_read_only_inputs",
+    "physical_hardware": false,
+    "physical_motion": false,
+    "device_write": false,
+    "host_privilege": false,
+    "external_destructive_write": false,
+    "credentials": []
+  },
+  "states": [
+    "ACCEPTED",
+    "ACCEPTING",
+    "APPROVAL_READY",
+    "APPROVED",
+    "BLOCKED",
+    "CANDIDATE",
+    "CI_VERIFIED",
+    "CLOSED",
+    "DIAGNOSING",
+    "DRAFT",
+    "FEASIBLE",
+    "IMPLEMENTING",
+    "INTAKE",
+    "PROMOTED",
+    "PROVIDER_FEASIBLE",
+    "PR_OPEN",
+    "RELEASE_APPROVED",
+    "REPLAN_REQUIRED",
+    "REVIEWED",
+    "TESTER_FEASIBLE",
+    "VERIFIED"
+  ],
+  "transitions": [
+    {
+      "from": "INTAKE",
+      "event": "draft_created",
+      "to": "DRAFT",
+      "actor": "planner",
+      "guard": "input_reconciliation"
+    },
+    {
+      "from": "DRAFT",
+      "event": "provider_feasible",
+      "to": "PROVIDER_FEASIBLE",
+      "actor": "framework",
+      "guard": "provider_contract_valid"
+    },
+    {
+      "from": "PROVIDER_FEASIBLE",
+      "event": "tester_feasible",
+      "to": "TESTER_FEASIBLE",
+      "actor": "tester",
+      "guard": "test_design_valid"
+    },
+    {
+      "from": "TESTER_FEASIBLE",
+      "event": "coder_feasible",
+      "to": "FEASIBLE",
+      "actor": "coder",
+      "guard": "handoff_and_scope_valid"
+    },
+    {
+      "from": "FEASIBLE",
+      "event": "reconciled",
+      "to": "APPROVAL_READY",
+      "actor": "planner",
+      "guard": "all_requirements_and_feasibility_current"
+    },
+    {
+      "from": "APPROVAL_READY",
+      "event": "approve_package",
+      "to": "APPROVED",
+      "actor": "human",
+      "guard": "exact_package_digest_and_required_approvals"
+    },
+    {
+      "from": "APPROVED",
+      "event": "start_implementation",
+      "to": "IMPLEMENTING",
+      "actor": "framework",
+      "guard": "role_access_and_scope_enforced"
+    },
+    {
+      "from": "IMPLEMENTING",
+      "event": "candidate_created",
+      "to": "CANDIDATE",
+      "actor": "framework",
+      "guard": "nonempty_commit_and_trace_valid"
+    },
+    {
+      "from": "CANDIDATE",
+      "event": "targeted_verified",
+      "to": "VERIFIED",
+      "actor": "tester",
+      "guard": "required_targeted_evidence_current"
+    },
+    {
+      "from": "VERIFIED",
+      "event": "reviews_complete",
+      "to": "REVIEWED",
+      "actor": "framework",
+      "guard": "review_and_required_safety_on_candidate"
+    },
+    {
+      "from": "REVIEWED",
+      "event": "readiness_validated",
+      "to": "ACCEPTING",
+      "actor": "framework",
+      "guard": "prerequisites_current_excluding_pending_fas_results"
+    },
+    {
+      "from": "ACCEPTING",
+      "event": "final_acceptance_passed",
+      "to": "ACCEPTED",
+      "actor": "tester",
+      "guard": "complete_exact_candidate_environment_suite_matrix"
+    },
+    {
+      "from": "ACCEPTED",
+      "event": "publish_pull_request",
+      "to": "PR_OPEN",
+      "actor": "framework",
+      "guard": "delivery_scm_and_remote_head_matches"
+    },
+    {
+      "from": "PR_OPEN",
+      "event": "ci_recorded",
+      "to": "CI_VERIFIED",
+      "actor": "framework",
+      "guard": "ci_evidence_matches_candidate"
+    },
+    {
+      "from": "CI_VERIFIED",
+      "event": "approve_merge",
+      "to": "RELEASE_APPROVED",
+      "actor": "human",
+      "guard": "required_merge_approvals"
+    },
+    {
+      "from": "ACCEPTED",
+      "event": "approve_artifact_release",
+      "to": "RELEASE_APPROVED",
+      "actor": "human",
+      "guard": "delivery_artifact_and_required_release_approvals"
+    },
+    {
+      "from": "RELEASE_APPROVED",
+      "event": "promote",
+      "to": "PROMOTED",
+      "actor": "framework",
+      "guard": "atomic_revalidation_of_all_bindings_and_lease"
+    },
+    {
+      "from": "PROMOTED",
+      "event": "close",
+      "to": "CLOSED",
+      "actor": "human",
+      "guard": "closure_recorded"
+    }
+  ],
+  "cross_cutting_events": {
+    "semantic_package_edit": {
+      "from": "any_unclosed_state",
+      "to": "DRAFT",
+      "effect": "new_revision; stale_approval; targeted_invalidation; rerun_affected_feasibility"
+    },
+    "architecture_failure": {
+      "from": "any_active_state",
+      "to": "REPLAN_REQUIRED",
+      "owner": "planner"
+    },
+    "clear_execution_failure": {
+      "from": "any_execution_state",
+      "to": "BLOCKED",
+      "effect": "record_owner_and_resume_point_without_candidate_defect_assumption"
+    },
+    "ambiguous_conflicting_or_repeated_failure": {
+      "from": "any_active_state",
+      "to": "DIAGNOSING",
+      "owner": "debugger"
+    },
+    "diagnosis_completed": {
+      "from": "DIAGNOSING",
+      "to": "BLOCKED",
+      "effect": "route_owner_without_granting_approval"
+    },
+    "resume": {
+      "from": "BLOCKED",
+      "to": "validated_recorded_resume_point",
+      "actor": "human_or_preapproved_policy",
+      "effect": "recheck_current_bindings_before_any_effect"
+    }
+  },
+  "retry_policy": {
+    "automatic_retry_budget_default": 0,
+    "override": "explicit_approved_per_owner_budget",
+    "on_exhaustion": "BLOCKED",
+    "repeat_identity": "owner + affected stable IDs + normalized failure class + unchanged material input digests",
+    "same_input_loop": "never_automatically_repeat",
+    "diagnostic_role_on_repetition": true
+  },
+  "risk_policy": {
+    "minimum_class_derived_from": "operation_consequences_and_provider_permissions; no technology-name shortcuts",
+    "classifications": {
+      "R0": "documents or nonfunctional changes without added consequences",
+      "R1": "ordinary software changes without R2/R3 consequences",
+      "R2": "concurrency/control/safety-critical changes, approved host privilege or consequential external changes",
+      "R3": "physical motion, destructive device operations, or physical deployment"
+    },
+    "merge_or_release_approvals": {
+      "R0": 1,
+      "R1": 1,
+      "R2": 2,
+      "R3": 2
+    },
+    "safety_review": [
+      "R2",
+      "R3"
+    ],
+    "hardware_approvals_R3": 2,
+    "unknown_permission": "deny",
+    "automatic_physical_execution": "prohibited",
+    "downgrade": "new_package_and_explicit_human_approval"
+  },
+  "concurrency": {
+    "preflight_order": [
+      "provider",
+      "tester",
+      "coder",
+      "planner_reconciliation"
+    ],
+    "agent_jobs": "one_active_job_per_product_checkout",
+    "parallel_provider_executions": "isolated_execution_and_evidence_directories",
+    "state_mutations": "per_project_transaction_with_compare_and_swap",
+    "environment_promotion_gc": "family_lock_plus_execution_leases"
+  },
+  "approval_basis": "ECP-V210-001-r1; explicit user instruction"
+}

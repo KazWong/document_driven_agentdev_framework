@@ -1,7 +1,0 @@
-schema_version: 1
-name: __PROJECT_NAME__
-repository: .
-scm:
-  provider: null
-  remote: origin
-  base_branch: main

@@ -1,0 +1,32 @@
+flowchart TB
+  U[User / authoritative project inputs] --> P[Planner]
+  P --> BP[ProjectBlueprint + Plan]
+  BP --> PF[Provider capability feasibility]
+  BP --> TPF[Tester testability / test design]
+  TPF --> CF[Coder feasibility]
+  PF --> R[Planner reconciliation]
+  CF --> R
+  R --> ECP[Engineering Change Package]
+  ECP --> HA[Human approval]
+  HA --> C[Coder implementation]
+  C --> SHA[Candidate SHA]
+  SHA --> TV[Tester authoritative verification]
+  TV --> RV[Reviewer]
+  RV --> SR{Safety review required?}
+  SR -->|Yes| SREV[Safety Reviewer]
+  SR -->|No| READY[Promotion readiness]
+  SREV --> READY
+  READY --> FAS[Final Acceptance Suite]
+  FAS --> PR[Promotion]
+  PR --> BASE[Project Baseline / Savepoint]
+
+  PROV[Local promoted Provider] --> ENV[Environment Manager]
+  ENV --> BACK[Generic EnvironmentBackend]
+  BACK --> TV
+
+  GRAPH[Artifact dependency DAG] --> P
+  GRAPH --> TPF
+  GRAPH --> C
+  GRAPH --> TV
+  GRAPH --> RV
+  GRAPH --> BASE

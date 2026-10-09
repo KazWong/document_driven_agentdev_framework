@@ -1,0 +1,16 @@
+flowchart TD
+    U[Request / user edits] --> P[Planner draft Blueprint + Plan]
+    P --> S[Schema + traceability validation]
+    S --> PF[Provider feasibility]
+    PF --> TF[Tester testability/design]
+    TF --> CF[Coder feasibility]
+    CF --> R{Findings require revision?}
+    R -- Yes --> P
+    R -- No --> A[Approval-ready Engineering Change Package]
+    A --> H{Human approves?}
+    H -- Modify / request change --> U
+    H -- Approve --> I[Implementation]
+    I --> X{Planner replan required?}
+    X -- No --> V[Verification]
+    X -- Yes --> P2[Planner package revision]
+    P2 --> S

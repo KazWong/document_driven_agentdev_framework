@@ -1,12 +1,6 @@
-# Release archives are generated from the committed Git tree.
-# Local/runtime state must never be exported into a release artifact.
 .env export-ignore
-.agent-state export-ignore
-.agent/work-items export-ignore
 .agent/runtime export-ignore
-.agent/cache export-ignore
-.agent/locks export-ignore
-.agent/tmp export-ignore
+.agent/knowledge export-ignore
+.agent/work-items export-ignore
 .agent-context export-ignore
 .test-results export-ignore
-.pytest_cache export-ignore

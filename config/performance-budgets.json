@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "basis": "Measured initial host run on 2026-10-01, with regression headroom; not a portable service guarantee. No acceptance requirement is waived.",
+  "graph_max_seconds": {
+    "reachability_seconds": 1.0,
+    "invalidation_seconds": 2.0,
+    "focused_svg_seconds": 5.0
+  },
+  "history_max_seconds": {
+    "history_lookup_max_seconds": 0.1,
+    "active_query_seconds": 0.5,
+    "compaction_seconds": 60.0,
+    "integrity_seconds": 90.0
+  },
+  "max_peak_rss_kib": 524288,
+  "required_graph_sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "required_history_records": 1000000
+}

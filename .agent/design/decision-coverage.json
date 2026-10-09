@@ -1,0 +1,1085 @@
+{
+  "schema_version": 1,
+  "mapping_kind": "approved_decisions_to_implementation_and_planned_acceptance",
+  "decisions": [
+    {
+      "decision": "D-001",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-010"
+      ],
+      "verifications": [
+        "VER-FW-012"
+      ],
+      "planned_acceptance_cases": [
+        "T-001",
+        "T-004",
+        "T-028",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/cli.py",
+        "src/agent_framework/migration.py"
+      ]
+    },
+    {
+      "decision": "D-002",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-001",
+        "REQ-FW-004"
+      ],
+      "verifications": [
+        "VER-FW-001",
+        "VER-FW-009"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py"
+      ]
+    },
+    {
+      "decision": "D-003",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-002"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-017",
+        "T-018",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/cli.py",
+        "src/agent_framework/engine.py"
+      ]
+    },
+    {
+      "decision": "D-004",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-004",
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-001",
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-009",
+        "VER-FW-011",
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-003",
+        "T-004",
+        "T-005",
+        "T-007",
+        "T-008",
+        "T-012",
+        "T-013",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-027",
+        "T-029",
+        "T-030",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-005",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-007"
+      ],
+      "verifications": [
+        "VER-FW-003",
+        "VER-FW-005"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-005",
+        "T-006",
+        "T-017",
+        "T-018",
+        "T-027"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py"
+      ]
+    },
+    {
+      "decision": "D-006",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-008"
+      ],
+      "verifications": [
+        "VER-FW-008"
+      ],
+      "planned_acceptance_cases": [
+        "T-011",
+        "T-022"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/failures.py"
+      ]
+    },
+    {
+      "decision": "D-007",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-005"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-007",
+        "VER-FW-008"
+      ],
+      "planned_acceptance_cases": [
+        "T-008",
+        "T-009",
+        "T-010",
+        "T-011",
+        "T-022"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-008",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-006"
+      ],
+      "verifications": [
+        "VER-FW-004"
+      ],
+      "planned_acceptance_cases": [
+        "T-006",
+        "T-017",
+        "T-023",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py"
+      ]
+    },
+    {
+      "decision": "D-009",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-009"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-009"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py"
+      ]
+    },
+    {
+      "decision": "D-010",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-004"
+      ],
+      "verifications": [
+        "VER-FW-001",
+        "VER-FW-009"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-011",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-005"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-007",
+        "VER-FW-008"
+      ],
+      "planned_acceptance_cases": [
+        "T-008",
+        "T-009",
+        "T-010",
+        "T-011",
+        "T-022"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-012",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-005",
+        "REQ-FW-015"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-007",
+        "VER-FW-008",
+        "VER-FW-015"
+      ],
+      "planned_acceptance_cases": [
+        "T-008",
+        "T-009",
+        "T-010",
+        "T-011",
+        "T-016",
+        "T-022"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-013",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-015"
+      ],
+      "verifications": [
+        "VER-FW-015"
+      ],
+      "planned_acceptance_cases": [
+        "T-009",
+        "T-010",
+        "T-016"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-014",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-009"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-009"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py"
+      ]
+    },
+    {
+      "decision": "D-015",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-009",
+        "REQ-FW-016"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-009",
+        "VER-FW-016"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-010",
+        "T-014",
+        "T-015",
+        "T-029",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-016",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-018"
+      ],
+      "verifications": [
+        "VER-FW-018"
+      ],
+      "planned_acceptance_cases": [
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-023",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-017",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-029",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-018",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-029",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-019",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011",
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-027",
+        "T-029",
+        "T-030",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-020",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-011",
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-027",
+        "T-029",
+        "T-030",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-021",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-007",
+        "REQ-FW-011"
+      ],
+      "verifications": [
+        "VER-FW-003",
+        "VER-FW-004",
+        "VER-FW-005"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-005",
+        "T-006",
+        "T-017",
+        "T-018",
+        "T-023",
+        "T-027",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-022",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-011"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-004",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-017",
+        "T-018",
+        "T-023",
+        "T-026",
+        "T-029",
+        "T-030",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-023",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-012"
+      ],
+      "verifications": [
+        "VER-FW-010",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-005",
+        "T-026",
+        "T-029"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-024",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-007"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-005",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-027",
+        "T-029",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-025",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-003",
+        "REQ-FW-012"
+      ],
+      "verifications": [
+        "VER-FW-002",
+        "VER-FW-003",
+        "VER-FW-010",
+        "VER-FW-011"
+      ],
+      "planned_acceptance_cases": [
+        "T-002",
+        "T-004",
+        "T-005",
+        "T-017",
+        "T-018",
+        "T-026",
+        "T-029",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-026",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-013"
+      ],
+      "verifications": [
+        "VER-FW-013"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-008"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-027",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-015"
+      ],
+      "verifications": [
+        "VER-FW-015"
+      ],
+      "planned_acceptance_cases": [
+        "T-009",
+        "T-010",
+        "T-016"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-028",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-015"
+      ],
+      "verifications": [
+        "VER-FW-015"
+      ],
+      "planned_acceptance_cases": [
+        "T-009",
+        "T-010",
+        "T-016"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py"
+      ]
+    },
+    {
+      "decision": "D-029",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-009",
+        "REQ-FW-016"
+      ],
+      "verifications": [
+        "VER-FW-006",
+        "VER-FW-009",
+        "VER-FW-016"
+      ],
+      "planned_acceptance_cases": [
+        "T-003",
+        "T-007",
+        "T-008",
+        "T-010",
+        "T-014",
+        "T-015",
+        "T-029",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-030",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-014"
+      ],
+      "verifications": [
+        "VER-FW-014",
+        "VER-FW-016"
+      ],
+      "planned_acceptance_cases": [
+        "T-010",
+        "T-011",
+        "T-014",
+        "T-015",
+        "T-029",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/execution.py"
+      ]
+    },
+    {
+      "decision": "D-031",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-016"
+      ],
+      "verifications": [
+        "VER-FW-016"
+      ],
+      "planned_acceptance_cases": [
+        "T-010",
+        "T-014",
+        "T-015",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py"
+      ]
+    },
+    {
+      "decision": "D-032",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-027",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-033",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-027",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-034",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-027",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-035",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-017"
+      ],
+      "verifications": [
+        "VER-FW-017"
+      ],
+      "planned_acceptance_cases": [
+        "T-007",
+        "T-012",
+        "T-013",
+        "T-027",
+        "T-031"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-036",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-018"
+      ],
+      "verifications": [
+        "VER-FW-018"
+      ],
+      "planned_acceptance_cases": [
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-023",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-037",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-018"
+      ],
+      "verifications": [
+        "VER-FW-018"
+      ],
+      "planned_acceptance_cases": [
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-023",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-038",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-019"
+      ],
+      "verifications": [
+        "VER-FW-019"
+      ],
+      "planned_acceptance_cases": [
+        "T-019",
+        "T-024",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-039",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-019"
+      ],
+      "verifications": [
+        "VER-FW-019"
+      ],
+      "planned_acceptance_cases": [
+        "T-019",
+        "T-024",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-040",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-018",
+        "REQ-FW-019"
+      ],
+      "verifications": [
+        "VER-FW-018",
+        "VER-FW-019"
+      ],
+      "planned_acceptance_cases": [
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-023",
+        "T-024",
+        "T-025",
+        "T-030"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ]
+    },
+    {
+      "decision": "D-041",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-020"
+      ],
+      "verifications": [
+        "VER-FW-020"
+      ],
+      "planned_acceptance_cases": [
+        "T-012",
+        "T-013",
+        "T-027"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ]
+    },
+    {
+      "decision": "D-042",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-021"
+      ],
+      "verifications": [
+        "VER-FW-021"
+      ],
+      "planned_acceptance_cases": [
+        "T-014",
+        "T-017",
+        "T-020",
+        "T-021"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py"
+      ]
+    },
+    {
+      "decision": "D-043",
+      "status": "confirmed_constraint",
+      "requirements": [
+        "REQ-FW-022"
+      ],
+      "verifications": [
+        "VER-FW-022"
+      ],
+      "planned_acceptance_cases": [
+        "T-007",
+        "T-022",
+        "T-027"
+      ],
+      "implementation_status": "implemented_host_coverage_live_acceptance_pending",
+      "implementation_modules": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/roles.py"
+      ]
+    }
+  ]
+}

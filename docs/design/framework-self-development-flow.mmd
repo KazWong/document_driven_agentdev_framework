@@ -1,0 +1,14 @@
+flowchart TD
+    F0[Accepted framework N] --> W[Framework work item]
+    K[Framework requirements + current ProjectBlueprint] --> W
+    W --> P[Planner Blueprint/Plan revision]
+    P --> Q[Provider + Tester + Coder feasibility]
+    Q --> H[Human approval package]
+    H --> C[Candidate framework N+1 in isolated worktree]
+    C --> T[Candidate/self tests + independent verification]
+    T --> R{Acceptance satisfied?}
+    R -- No --> D[Diagnose / replan / repair]
+    D --> W
+    R -- Yes --> M[Promotion using stable/recovery boundary]
+    M --> F1[Accepted framework N+1]
+    F1 --> A[Reconcile current architecture + project knowledge]

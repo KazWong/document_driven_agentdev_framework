@@ -1,0 +1,15 @@
+flowchart TD
+    PR[Approved project environment requirement] --> RES[Provider compatibility resolution]
+    RES --> FIND{Compatible promoted environment?}
+    FIND -->|yes| REUSE[Reuse promoted generation]
+    FIND -->|no family exists| NF[Create environment family project/work]
+    FIND -->|family exists but update required| NG[Create new generation work]
+    NF --> PLAN[Normal framework plan/test/code lifecycle]
+    NG --> PLAN
+    PLAN --> ACC[Provider acceptance contract]
+    ACC -->|pass| PROM[Promote immutable generation]
+    ACC -->|environment defect| FIX[Environment repair/update work]
+    FIX --> PLAN
+    PROM --> RUN[Run project verification]
+    REUSE --> RUN
+    RUN --> EV[Evidence binds candidate SHA + environment generation]

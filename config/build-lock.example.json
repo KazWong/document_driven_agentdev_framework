@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "status": "unresolved_example",
+  "ubuntu_image": null,
+  "node_image": null,
+  "codex_version": null,
+  "platform": "linux/amd64",
+  "note": "Supply independently verified immutable base-image references and an exact approved Codex version. The builder rejects missing values, tags and latest. Actual resolved image IDs and inventories are recorded after build."
+}

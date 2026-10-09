@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "status": "approved_design_implemented_pending_live_acceptance",
+  "work_item": "V210-001",
+  "source_commit": "29c44e74ad6e60dc298adbfa60b7402f5ce1b196",
+  "tasks": [
+    {
+      "id": "TASK-FW-001",
+      "title": "Pin baseline, restore executable modes, preserve prior controller",
+      "requirement_ids": [
+        "REQ-FW-010",
+        "REQ-FW-012"
+      ],
+      "proposed_scope": [
+        "bin/**",
+        "scripts/**",
+        "tests/**"
+      ],
+      "acceptance_cases": [
+        "T-001",
+        "T-029"
+      ],
+      "depends_on": [],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/cli.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/migration.py",
+        "src/agent_framework/scm.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-002",
+      "title": "Versioned records, schema/policy, managed IDs and self-Blueprint",
+      "requirement_ids": [
+        "REQ-FW-003",
+        "REQ-FW-011",
+        "REQ-FW-012",
+        "REQ-FW-017"
+      ],
+      "proposed_scope": [
+        "schemas/**",
+        "config/**",
+        "src/robotics_agent_env/knowledge.py",
+        "src/robotics_agent_env/policy.py",
+        ".agent/knowledge/**"
+      ],
+      "acceptance_cases": [
+        "T-002",
+        "T-005",
+        "T-006",
+        "T-007",
+        "T-023"
+      ],
+      "depends_on": [
+        "TASK-FW-001"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/store.py",
+        "src/agent_framework/test_artifacts.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-003",
+      "title": "DAG, validity projections, snapshots, archives and views",
+      "requirement_ids": [
+        "REQ-FW-018",
+        "REQ-FW-019"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/graph.py",
+        "src/robotics_agent_env/archives.py",
+        "src/robotics_agent_env/graph_render.py"
+      ],
+      "acceptance_cases": [
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-024",
+        "T-025"
+      ],
+      "depends_on": [
+        "TASK-FW-002"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/graph.py",
+        "src/agent_framework/store.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-004",
+      "title": "Generic ProcessExecutor/EnvironmentBackend and Docker implementation",
+      "requirement_ids": [
+        "REQ-FW-009",
+        "REQ-FW-014",
+        "REQ-FW-016"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/execution/**",
+        "docker/main/**",
+        "docker/generic/**",
+        "compose.yaml"
+      ],
+      "acceptance_cases": [
+        "T-014",
+        "T-015",
+        "T-029",
+        "T-031"
+      ],
+      "depends_on": [
+        "TASK-FW-003"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-005",
+      "title": "Managed provider/environment projects, generations, overlays, retention",
+      "requirement_ids": [
+        "REQ-FW-001",
+        "REQ-FW-004",
+        "REQ-FW-005",
+        "REQ-FW-006",
+        "REQ-FW-008",
+        "REQ-FW-013",
+        "REQ-FW-015"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/providers/**",
+        "src/robotics_agent_env/environments/**",
+        "providers/**"
+      ],
+      "acceptance_cases": [
+        "T-003",
+        "T-008",
+        "T-009",
+        "T-010",
+        "T-011",
+        "T-016"
+      ],
+      "depends_on": [
+        "TASK-FW-004"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/failures.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-006",
+      "title": "Role context isolation, typed artifacts and test ownership",
+      "requirement_ids": [
+        "REQ-FW-007",
+        "REQ-FW-017",
+        "REQ-FW-020",
+        "REQ-FW-022"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/codex_runner.py",
+        "src/robotics_agent_env/roles/**",
+        "config/roles/**",
+        ".codex/**"
+      ],
+      "acceptance_cases": [
+        "T-012",
+        "T-013",
+        "T-022",
+        "T-027"
+      ],
+      "depends_on": [
+        "TASK-FW-005"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/policy.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/test_artifacts.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-007",
+      "title": "ECP workflow, candidate trace, evidence, mandatory FAS and release guards",
+      "requirement_ids": [
+        "REQ-FW-003",
+        "REQ-FW-007",
+        "REQ-FW-008",
+        "REQ-FW-011",
+        "REQ-FW-014",
+        "REQ-FW-021",
+        "REQ-FW-022"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/workflow.py",
+        "src/robotics_agent_env/workitem.py",
+        "src/robotics_agent_env/verification.py",
+        "src/robotics_agent_env/scm.py"
+      ],
+      "acceptance_cases": [
+        "T-005",
+        "T-006",
+        "T-014",
+        "T-017",
+        "T-020",
+        "T-021",
+        "T-022",
+        "T-023"
+      ],
+      "depends_on": [
+        "TASK-FW-006"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/failures.py",
+        "src/agent_framework/roles.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/store.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-008",
+      "title": "Neutral projects, migration and readable CLI",
+      "requirement_ids": [
+        "REQ-FW-002",
+        "REQ-FW-010",
+        "REQ-FW-018",
+        "REQ-FW-019"
+      ],
+      "proposed_scope": [
+        "src/robotics_agent_env/*_cli.py",
+        "src/robotics_agent_env/migration/**",
+        "templates/**",
+        "bin/**"
+      ],
+      "acceptance_cases": [
+        "T-004",
+        "T-028",
+        "T-030"
+      ],
+      "depends_on": [
+        "TASK-FW-007"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/cli.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/graph.py",
+        "src/agent_framework/migration.py",
+        "src/agent_framework/store.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-009",
+      "title": "Reconcile architecture/operations/commands and self-development trace",
+      "requirement_ids": [
+        "REQ-FW-001",
+        "REQ-FW-009",
+        "REQ-FW-012"
+      ],
+      "proposed_scope": [
+        "docs/**",
+        "README.md",
+        "AGENTS.md",
+        "CHANGELOG.md",
+        "VERSION",
+        "Makefile",
+        "scripts/qa/**",
+        "scripts/package.sh",
+        "requirements*.txt",
+        "bitbucket-pipelines.yml"
+      ],
+      "acceptance_cases": [
+        "T-007",
+        "T-026",
+        "T-029"
+      ],
+      "depends_on": [
+        "TASK-FW-008"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/contracts.py",
+        "src/agent_framework/docker_backend.py",
+        "src/agent_framework/engine.py",
+        "src/agent_framework/environments.py",
+        "src/agent_framework/execution.py",
+        "src/agent_framework/scm.py"
+      ],
+      "status": "implemented_pending_release_acceptance"
+    },
+    {
+      "id": "TASK-FW-010",
+      "title": "Execute release matrix on exact final candidate and package evidence",
+      "requirement_ids": [
+        "REQ-FW-012",
+        "REQ-FW-019",
+        "REQ-FW-021"
+      ],
+      "proposed_scope": [
+        "tests/**",
+        "scripts/qa/**",
+        "docs/qa-report.md",
+        "ARTIFACT-MANIFEST.sha256"
+      ],
+      "acceptance_cases": [
+        "T-001",
+        "T-002",
+        "T-003",
+        "T-004",
+        "T-005",
+        "T-006",
+        "T-007",
+        "T-008",
+        "T-009",
+        "T-010",
+        "T-011",
+        "T-012",
+        "T-013",
+        "T-014",
+        "T-015",
+        "T-016",
+        "T-017",
+        "T-018",
+        "T-019",
+        "T-020",
+        "T-021",
+        "T-022",
+        "T-023",
+        "T-024",
+        "T-025",
+        "T-026",
+        "T-027",
+        "T-028",
+        "T-029",
+        "T-030",
+        "T-031"
+      ],
+      "depends_on": [
+        "TASK-FW-009"
+      ],
+      "implementation_owner": "coder",
+      "test_owner": "tester",
+      "implemented_paths": [
+        "src/agent_framework/engine.py",
+        "src/agent_framework/graph.py",
+        "src/agent_framework/scm.py",
+        "src/agent_framework/store.py"
+      ],
+      "status": "host_verification_and_packaging_complete_live_matrix_unrun"
+    }
+  ],
+  "excluded_actions": [
+    "remote_publication",
+    "protected_branch_write",
+    "force_push",
+    "physical_hardware_execution",
+    "claim_release_pass_without_required_live_evidence"
+  ],
+  "delivery": [
+    "v2.0.3-to-v2.1.0.patch",
+    "v2.1.0-complete-environment-source.tar.gz",
+    "v2.1.0-complete-environment-source.zip",
+    "release-report",
+    "manifest-and-provenance",
+    "built-image-digests-and-artifacts-after-actual-build"
+  ],
+  "authorization": {
+    "source": "Explicit user approval of all corrections and a clean v2.1.0 rewrite",
+    "approved_package": "ECP-V210-001-r1",
+    "manifest_digest": "6203efdcf778260dd767a672f106fb81f9e80c2662f9f07c38981650779bf825",
+    "release_approval": false
+  },
+  "scope_resolution": "The approved complete rewrite uses src/agent_framework. proposed_scope preserves the original planning record; implemented_paths maps the replacement. No legacy runtime compatibility layer is retained."
+}

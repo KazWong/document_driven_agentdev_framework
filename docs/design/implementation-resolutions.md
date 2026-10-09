@@ -1,0 +1,59 @@
+# Approved implementation resolutions
+
+User approval: all ECP corrections and clean v2.1.0 code generation. No release promotion, remote publication or hardware action is implied.
+
+The implementation keeps controller state outside product checkouts to enforce independent-test and approval isolation. Package data is the authority; project-local design files and public docs are projections. Runtime CLI names are listed in `../commands.md`; the historical proposed CLI below is conceptual, not an alternate API.
+
+# Proposed resolutions of remaining implementation decisions
+
+Status: **proposed for ECP-V210-001-r1 approval**. These are not newly confirmed D-* decisions. Twelve remaining items below require implementation approval. O-017 is already resolved by the current user request and is recorded without requesting approval again.
+
+| Open item | Approved resolution |
+|---|---|
+| O-001 | Versioned JSON semantic contracts, controlled ID allocation/lineage, and immutable record envelopes. Project `.agent/knowledge/` contains controller-owned records, objects, and a transactional SQLite ledger. Human Markdown/Mermaid are generated projections or explicit proposal inputs; edits never implicitly approve. `proposals/contracts.schema.json` defines the first schema. |
+| O-002 | Discover existing Git repository, `.agent/project.yaml`, authoritative documents and actual tracked files. Preserve source layout. A versioned legacy adapter translates old metadata into unresolved draft knowledge; any ambiguous targets/requirements require reconciliation. Old kind/lane names are interpreted only by migration adapters/provider data, not core. |
+| O-004 | Provider schema separates requirement schema, deterministic compatibility resolver, bootstrap capability dependencies, permissions, acceptance contract and runtime actions. Resolver/action executes through the backend; the host never imports arbitrary provider Python. Registry admits only promoted immutable source/artifact identities. Validate every returned envelope against backend-stamped execution identity. |
+| O-009 | A versioned policy registry owns role contracts. Prompts, tool profiles and documentation are projections. Typed schema per output stage; host controller validates expected role, run identity, input digest and current lifecycle state. Coder alone writes allowed production paths; Tester supplies test artifacts through controlled materialization. No direct approval/SCM writes from agent roles. |
+| O-010 | Serial preflight: provider → Tester testability/design → Coder feasibility using full requirements and development-facing tests → Planner reconciliation. First release uses one active agent job per product checkout; parallel isolated verification jobs are allowed. Approximately 70/30 is a documented coverage rationale, not a numerical pass gate. Independent tests and revealing logs are excluded from Coder filesystem/context, not merely omitted from the prompt. |
+| O-012 | Use the explicit state/event/guard registry in `policy-and-lifecycle.json`. All failure paths record owner, input bindings and resume point. Architecture failure creates REPLAN_REQUIRED; ambiguous/conflicting/repeated failures use on-demand diagnosis; known failures route directly. Promotion rechecks exact candidate, current requirements, suite/environment matrix, approvals and leases in one transaction. |
+| O-013 | The policy registry is the sole authority for states, roles, risk/permission categories and gate counts. JSON Schema is the sole structural contract source. Python handlers implement semantic checks referenced by registry guard IDs; generated constants/prompts/docs cannot independently redefine policy. Drift validation is a release gate. |
+| O-014 | Generic consequence facts: network scope, declared filesystem inputs, hardware access, physical motion, device writes, host privilege, destructive external writes, requested credentials. Unknown permission is denied. Preserve current approval counts: one R0/R1 and two R2/R3 merge/release approvals; safety review for R2/R3 and two R3 hardware approvals. Classify consequences, not technology names. Automatic project/provider execution never receives physical devices; existing explicit human hardware authorization stays separate. |
+| O-015 | Default automatic retry budget is **zero**. A failure records a resumable owner route and stops; an approved policy may grant a finite owner-specific budget. Never automatically repeat unchanged inputs. A repeated equivalent failure routes to on-demand diagnosis and then a blocked owner action; diagnosis cannot grant an infinite repair loop. No arbitrary hidden retry count. |
+| O-016 | Keep agentctl/projectctl/testctl/scmctl/hardwarectl. Add normal commands for neutral creation, package view/diff/edit/validate/approve, actions/show, project Blueprint/trace/graph/baseline, provider/environment inspection, and migration plan/apply/verify/rollback. Human-readable output is default; `--json` is stable machine output. Internal state writes are not normal user commands. |
+| O-017 — resolved by current request | Exact baseline is uploaded v2.0.3 commit `29c44e74ad6e60dc298adbfa60b7402f5ce1b196`. Deliver one binary-capable Git patch from that base, a complete versioned source/environment-definition archive, manifest/provenance and release evidence. Real built image artifacts/digests are included only after actual Docker builds. Never label an unbuilt definition archive a tested image. |
+| O-018 | Linux/amd64 + Docker is the initial acceptance target, preserving the supplied Linux/Docker deployment direction; this exact target is approved for this implementation. No Web GUI. Defer interactive VS Code, public IPC, full async agents, remote-CI authentication hardening, cryptographic authentication/encryption, full HIL redesign and automated self-updater. Keep generic backend boundaries, current human merge/hardware gates and independent manual recovery. Docker host-broker redesign remains deferred, but agent/provider subprocesses must not inherit controller socket/credentials/privileges. |
+| O-019 | Materialize the reserved framework IDs into `framework-blueprint.json`. Preserve all 001–019 definitions. Explicitly map reconstructed 020/021/022 to D-041/D-042/D-043; preserve this provenance. Each implementation task and candidate diff maps to those IDs; no release-ready status while traceability or implemented documentation is inconsistent. |
+
+## Storage and transaction contract
+
+The authoritative state consists of the controller-owned append-only record ledger plus content-addressed payload objects. SQLite indexes current heads, semantic edges, workflow events, object references, locks/leases and archive locations. Readable JSON/Markdown exports are projections, not additional writable truth. Keep SQLite on the local Linux filesystem; do not assume cross-host/shared-network filesystem locking.
+
+Each mutation validates the expected revision and takes a project transaction. Write objects to temporary files, hash and fsync, atomically publish, then commit referring records. A crash before commit leaves collectable orphans; no committed record may reference an unverified object. Approval is an append-only record of package identity, actor assertion, timestamp, policy and exact digest. Same-user malicious rewriting of records plus hashes is outside v2.1 cryptographic assurance; the design claims corruption/tamper detection under controlled writes, not authenticated signatures.
+
+A canonical serializer version fixes UTF-8, key ordering, whitespace and number handling before digest use. Reject duplicate JSON keys and nonfinite numbers; schema bounds and normalized provider requirements prevent ambiguous identities. Records include encoder/schema versions so migrations cannot silently change digest meaning.
+
+## Dependency and archive contract
+
+Edges point from prerequisite to dependent. An approval consumes an immutable ECP; it is not an upstream dependency of its own Blueprint. Navigation/membership relationships are not automatically invalidation edges. Validate a batch transaction as a whole, including same-batch edges, before publishing it.
+
+Current validity is a projection over immutable revision records. Stale propagation preserves unaffected heads and produces a witness path and owning role. Changing a candidate or environment does not mutate an old test result. Scope selection uses the current dependency closure and explicit input digests.
+
+v2.1 is conservative about verification reuse: a different candidate SHA reruns candidate-bound verification. Exact-same-candidate evidence may be reused only with current obligation, suite, provider, generation and other declared bindings. Final Acceptance always executes for a new candidate. This limits optimization while the dependency model is being established; no old PASS is relabeled as a fresh execution.
+
+A baseline snapshots alive heads, source/evidence/environment/approval references and root digest. Compaction moves obsolete immutable records to compressed, indexed partitions and verifies them before switching references. Preserve necessary archived bridge dependencies or explicit boundary summaries with identical reachability. Do not collapse all element dependencies onto a single baseline supernode. Archive lookup is lazy; ordinary active queries must not load a million historical records. Snapshot/restore returns historical records for inspection and never rewinds current approval or candidate pointers implicitly.
+
+## Tests and approval boundaries
+
+The ECP binds VER obligations, acceptance thresholds, required target matrix, testability/coverage and ownership constraints. Concrete test revisions are separate immutable artifacts. Tester may correct their implementation within the same approved semantics; the controller validates compatibility and reruns affected evidence. Such a revision cannot silently change the obligation, threshold, target matrix or risk. If it does, a new ECP approval is required. Repository test updates create a new candidate SHA and therefore new candidate-bound evidence.
+
+FAS readiness requires complete prerequisite targeted verification and reviews, not its own pending results. Every required matrix cell must then pass on exact bindings. Optional cells do not block. Candidate failures, infrastructure failures, test defects, unsupported requirements, timeouts and malformed output remain distinguishable. A backend launch failure is not evidence that application behavior failed.
+
+## Initial trust and delivery modes
+
+The first accepted generic build/run/runtime capability comes from a separately approved, versioned installation/release bootstrap record, not self-promotion by an unverified environment. That narrowly scoped record is part of release evidence. Optional domain providers and all later generations follow the normal managed lifecycle. Removing an optional provider must not break core QA or neutral project creation.
+
+SCM delivery keeps exact PR-head/CI/merge gates. Local environment/provider/artifact delivery uses the same Blueprint/feasibility/approval/trace/verification/review/FAS gates plus human release approval, without inventing a remote PR. Delivery mode is part of the approved ECP, not an agent-selected way to evade merge gates. This turn requests artifacts only; no remote publication or hardware operation is authorized.
+
+## Remaining measured release decisions
+
+Concrete immutable Docker base-image/package locks and graph performance budgets must be populated from the real build/measurements before release acceptance. The approval here authorizes implementation under this method; it is not advance acceptance of unknown benchmark values. Material target/scope/permission changes discovered while implementing return to the ECP process.

@@ -1,0 +1,37 @@
+{
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Implement and verify the message",
+      "requirements": [
+        "REQ-001"
+      ],
+      "design": [
+        "CMP-001"
+      ],
+      "paths": [
+        "src/**",
+        "tests/**"
+      ]
+    }
+  ],
+  "scope": {
+    "include": [
+      "src/**",
+      "tests/**"
+    ],
+    "exclude": []
+  },
+  "risk_class": "R1",
+  "permissions": {
+    "network": "none",
+    "host_filesystem": "declared_read_only_inputs",
+    "physical_hardware": false,
+    "physical_motion": false,
+    "device_write": false,
+    "host_privilege": false,
+    "external_destructive_write": false,
+    "credentials": []
+  },
+  "delivery": "artifact"
+}

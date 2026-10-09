@@ -1,0 +1,8 @@
+flowchart LR
+  H[Historical revisions and evidence] --> B[Project Baseline / Savepoint]
+  B --> A[Active graph frontier]
+  H --> P[Compressed immutable archive pack]
+  P --> B
+  A --> C[New change subgraph]
+  C --> N[Next stable milestone]
+  N --> B2[Next Project Baseline]

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "src/message.py",
+    "requirement_ids": [
+      "REQ-001"
+    ],
+    "design_ids": [
+      "CMP-001"
+    ],
+    "task_ids": [
+      "TASK-001"
+    ]
+  }
+]

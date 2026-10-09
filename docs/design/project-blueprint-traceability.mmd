@@ -1,0 +1,11 @@
+flowchart LR
+    R[REQ-* Requirement] --> B[CMP-* / IFACE-* Blueprint]
+    B --> P[Plan task]
+    P --> I[Coder implementation trace]
+    I --> C[Candidate SHA]
+    R --> V[VER-* Verification obligation]
+    B --> V
+    V --> T[Tester test/evidence mapping]
+    C --> T
+    T --> E[Candidate-bound evidence]
+    E --> M[Traceability matrix]

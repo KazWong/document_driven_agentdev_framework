@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-agent-framework"
+version = "2.1.0"
+description = "Technology-neutral, approval-gated engineering lifecycle"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["jsonschema==4.26.0"]
+
+[project.scripts]
+agentctl = "agent_framework.cli:main"
+projectctl = "agent_framework.cli:project_main"
+testctl = "agent_framework.cli:test_main"
+scmctl = "agent_framework.cli:scm_main"
+hardwarectl = "agent_framework.cli:hardware_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.setuptools.package-data]
+agent_framework = ["data/*.json"]

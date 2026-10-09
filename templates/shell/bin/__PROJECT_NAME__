@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-printf 'hello from __PROJECT_NAME__\n'
