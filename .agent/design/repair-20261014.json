@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "repair_id": "v2.1.0-repair-20261014-r1",
+  "baseline_sha": "6b7a1fac84f913b9b6012e65cc620a4373f4741b",
+  "input_archives_sha256": {
+    "robotics-ai-agent-dev-env(20261014-002933).zip": "c2088a7344e6de7f09f94772eb4680aadd9a814d06933a94d9acb89067182de1",
+    "ros2-counter-automation-test-kit-work005(1).zip": "7cdd1085bf0a714e2bb6b27a171e9c18c02df1860f7d0edac9917c49e12f453c"
+  },
+  "authorization": "User requested source debugging and fixes with generated tests; no release approval was supplied or synthesized.",
+  "status": "host_verified_candidate_not_promoted",
+  "live_acceptance": false,
+  "original_requirements_and_policy_preserved": true,
+  "historical_trace": ".agent/design/history/candidate-trace-before-repair-20261014.json",
+  "runtime_files_manifest": "matching kit inputs/expected-framework.json",
+  "failure_groups": [
+    {
+      "id": "F01",
+      "finding": "Rejected Planner output was cached/reused; invalid revisions escaped bounded retry accounting.",
+      "repair": "Record rejected bytes/findings; persistent pre-dispatch revision reservations and fresh failure context.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F02",
+      "finding": "Replanning after feasibility failure could crash Coder context on missing result fields.",
+      "repair": "Preserve result/resume-state provenance and distinguish historic feasibility from current implementation failure.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F03",
+      "finding": "String/number remote authorization could be truthy; malformed automation settings failed late.",
+      "repair": "Strict booleans, bounded integer budget, typed maps/strings and unknown-field rejection.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F04",
+      "finding": "Invalid/incomplete Coder traces could leave trusted source dirty.",
+      "repair": "Validate exact delta, task/requirement/design binding and completeness before application; preserve rejection evidence.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F05",
+      "finding": "Nested Codex transport accepted duplicate keys and non-finite JSON numbers.",
+      "repair": "Reject ambiguous JSON rather than normalizing it into apparently valid output.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F06",
+      "finding": "Plan tasks could advertise paths outside the approved include scope.",
+      "repair": "Conservative task-pattern containment plus explicit repo-relative path diagnostics; final concrete scope checks remain.",
+      "tests": "test_repair_regressions.py"
+    },
+    {
+      "id": "F07",
+      "finding": "Trusted Git lost SSH agent variables and interpreted colon-prefixed file paths as pathspec syntax.",
+      "repair": "Forward SSH variables only to trusted Git and force literal pathspecs/noninteractive transport.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F08",
+      "finding": "Trusted Docker calls lost TLS/configuration environment settings.",
+      "repair": "Preserve Docker TLS verification/certificate/config variables at that boundary only.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F09",
+      "finding": "Read-only Docker mount targets accepted traversal/noncanonical components.",
+      "repair": "Reject empty, dot and parent components before starting Docker.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F10",
+      "finding": "Delivery validated only the first push URL.",
+      "repair": "Reject multiple fetch/push destinations instead of risking an unapproved extra push.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F11",
+      "finding": "Bitbucket approval could be revoked while comments were paginated.",
+      "repair": "Re-read current participants after comment retrieval before accepting a SHA-specific approval.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F12",
+      "finding": "Existing public state directories could expose controller/independent-test data.",
+      "repair": "Reject non-owner-only state before opening the ledger; validate CLI state locations before writes; private migration staging.",
+      "tests": "test_boundary_regressions.py; test_migration_cli.py"
+    },
+    {
+      "id": "F13",
+      "finding": "Old incompatible generations could not retire; active child generations did not protect their base.",
+      "repair": "Permit retirement without availability/provider compatibility, but prevent retirement of a base used by a promoted child.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F14",
+      "finding": "Coder copying and job/receipt publication were not crash-atomic.",
+      "repair": "Durable before/after CAS journals, rollback, explicit recover-role, and job/receipt publication in one transaction.",
+      "tests": "test_recovery_regressions.py"
+    },
+    {
+      "id": "F15",
+      "finding": "Wrong-stage, unbound or semantically invalid pre-approval outputs could become permanent cached failures.",
+      "repair": "Exact stage/reference contracts and bounded replanning for Tester design/testability, Coder handoff and Planner reconciliation.",
+      "tests": "test_stage_restart_regressions.py"
+    },
+    {
+      "id": "F16",
+      "finding": "A cumulative revert could create a commit before empty-candidate rejection.",
+      "repair": "Reject an empty baseline-to-tree delta before commit.",
+      "tests": "test_boundary_regressions.py"
+    },
+    {
+      "id": "F17",
+      "finding": "Pre-commit interruption could not recover; another work item's intent could hijack recovery.",
+      "repair": "Match pending work/package identities and exact tree; recover both commit phases without rerunning Coder.",
+      "tests": "test_stage_restart_regressions.py; test_recovery_authoring.py"
+    },
+    {
+      "id": "F18",
+      "finding": "Current operational guidance and packaging did not identify the repaired source/kit and recovery boundary.",
+      "repair": "Repair ID, trace/provenance, fresh kit identities and manifests; correct one-human-per-gate hardware denial text.",
+      "tests": "release checks; repaired kit checks"
+    }
+  ]
+}

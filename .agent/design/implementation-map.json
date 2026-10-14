@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "candidate_not_promoted",
-  "baseline_sha": "29c44e74ad6e60dc298adbfa60b7402f5ce1b196",
+  "baseline_sha": "6b7a1fac84f913b9b6012e65cc620a4373f4741b",
   "requirements": [
     {
       "requirement": "REQ-FW-001",
@@ -44,7 +44,9 @@
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
-        "tests/test_recovery_authoring.py"
+        "tests/test_recovery_authoring.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-002",
@@ -61,7 +63,8 @@
       "host_test_files": [
         "tests/test_environments.py",
         "tests/test_lifecycle.py",
-        "tests/test_generic_provider.py"
+        "tests/test_generic_provider.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005"
@@ -76,7 +79,8 @@
       ],
       "host_test_files": [
         "tests/test_extended_gates.py",
-        "tests/test_environments.py"
+        "tests/test_environments.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005"
@@ -91,7 +95,9 @@
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
-        "tests/test_recovery_authoring.py"
+        "tests/test_recovery_authoring.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005"
@@ -102,11 +108,14 @@
       "requirement": "REQ-FW-007",
       "modules": [
         "src/agent_framework/engine.py",
-        "src/agent_framework/failures.py"
+        "src/agent_framework/failures.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_recovery_authoring.py",
-        "tests/test_lifecycle.py"
+        "tests/test_lifecycle.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-006",
@@ -123,7 +132,9 @@
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
-        "tests/test_recovery_authoring.py"
+        "tests/test_recovery_authoring.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_recovery_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005",
@@ -142,7 +153,8 @@
         "tests/test_execution.py",
         "tests/test_environments.py",
         "tests/test_release.py",
-        "tests/test_generic_provider.py"
+        "tests/test_generic_provider.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-004",
@@ -157,7 +169,8 @@
         "src/agent_framework/cli.py"
       ],
       "host_test_files": [
-        "tests/test_migration_cli.py"
+        "tests/test_migration_cli.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-001",
@@ -169,11 +182,16 @@
       "requirement": "REQ-FW-011",
       "modules": [
         "src/agent_framework/engine.py",
-        "src/agent_framework/store.py"
+        "src/agent_framework/store.py",
+        "src/agent_framework/worktree_apply.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
-        "tests/test_store.py"
+        "tests/test_store.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_recovery_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-002",
@@ -185,11 +203,17 @@
       "requirement": "REQ-FW-012",
       "modules": [
         "src/agent_framework/engine.py",
-        "src/agent_framework/scm.py"
+        "src/agent_framework/scm.py",
+        "src/agent_framework/worktree_apply.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_recovery_authoring.py",
-        "tests/test_release.py"
+        "tests/test_release.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_boundary_regressions.py",
+        "tests/test_recovery_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-001",
@@ -206,7 +230,8 @@
       ],
       "host_test_files": [
         "tests/test_extended_gates.py",
-        "tests/test_environments.py"
+        "tests/test_environments.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005"
@@ -238,7 +263,8 @@
       ],
       "host_test_files": [
         "tests/test_environments.py",
-        "tests/test_execution.py"
+        "tests/test_execution.py",
+        "tests/test_boundary_regressions.py"
       ],
       "tasks": [
         "TASK-FW-005"
@@ -250,11 +276,15 @@
       "modules": [
         "src/agent_framework/docker_backend.py",
         "src/agent_framework/roles.py",
-        "src/agent_framework/scm.py"
+        "src/agent_framework/scm.py",
+        "src/agent_framework/worktree_apply.py"
       ],
       "host_test_files": [
         "tests/test_execution.py",
-        "tests/test_recovery_authoring.py"
+        "tests/test_recovery_authoring.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_boundary_regressions.py",
+        "tests/test_recovery_regressions.py"
       ],
       "tasks": [
         "TASK-FW-004"
@@ -266,11 +296,16 @@
       "modules": [
         "src/agent_framework/roles.py",
         "src/agent_framework/test_artifacts.py",
-        "src/agent_framework/policy.py"
+        "src/agent_framework/policy.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
-        "tests/test_extended_gates.py"
+        "tests/test_extended_gates.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_boundary_regressions.py",
+        "tests/test_recovery_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-002",
@@ -282,11 +317,13 @@
       "requirement": "REQ-FW-018",
       "modules": [
         "src/agent_framework/store.py",
-        "src/agent_framework/graph.py"
+        "src/agent_framework/graph.py",
+        "src/agent_framework/worktree_apply.py"
       ],
       "host_test_files": [
         "tests/test_store.py",
-        "tests/test_extended_gates.py"
+        "tests/test_extended_gates.py",
+        "tests/test_recovery_regressions.py"
       ],
       "tasks": [
         "TASK-FW-003",
@@ -315,11 +352,16 @@
       "modules": [
         "src/agent_framework/test_artifacts.py",
         "src/agent_framework/roles.py",
-        "src/agent_framework/engine.py"
+        "src/agent_framework/engine.py",
+        "src/agent_framework/worktree_apply.py"
       ],
       "host_test_files": [
         "tests/test_extended_gates.py",
-        "tests/test_recovery_authoring.py"
+        "tests/test_recovery_authoring.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_boundary_regressions.py",
+        "tests/test_recovery_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-006"
@@ -329,12 +371,17 @@
     {
       "requirement": "REQ-FW-021",
       "modules": [
-        "src/agent_framework/engine.py"
+        "src/agent_framework/engine.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_lifecycle.py",
         "tests/test_extended_gates.py",
-        "tests/test_generic_provider.py"
+        "tests/test_generic_provider.py",
+        "tests/test_repair_regressions.py",
+        "tests/test_boundary_regressions.py",
+        "tests/test_recovery_regressions.py",
+        "tests/test_stage_restart_regressions.py"
       ],
       "tasks": [
         "TASK-FW-007",
@@ -347,11 +394,13 @@
       "modules": [
         "src/agent_framework/engine.py",
         "src/agent_framework/failures.py",
-        "src/agent_framework/roles.py"
+        "src/agent_framework/roles.py",
+        "src/agent_framework/automation.py"
       ],
       "host_test_files": [
         "tests/test_recovery_authoring.py",
-        "tests/test_lifecycle.py"
+        "tests/test_lifecycle.py",
+        "tests/test_repair_regressions.py"
       ],
       "tasks": [
         "TASK-FW-006",
@@ -364,5 +413,7 @@
     "scripts/benchmark_graph.py",
     "config/performance-budgets.json"
   ],
-  "authority_note": "Implementation and host-test mapping is not independent role execution, FAS evidence or human release approval."
+  "authority_note": "Implementation and host-test mapping is not independent role execution, FAS evidence or human release approval.",
+  "previous_baseline_sha": "29c44e74ad6e60dc298adbfa60b7402f5ce1b196",
+  "repair_id": "v2.1.0-repair-20261014-r1"
 }
