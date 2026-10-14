@@ -1,0 +1,393 @@
+{
+  "status": "host-verified candidate; live acceptance pending",
+  "baseline_archive": "robotics-ai-agent-dev-env(9).zip",
+  "baseline_archive_sha256": "bcca427fea3201827e931f1d5c84ddb2371a818fbbe02e5dddeac72e8191eb16",
+  "design": "docs/design/automation-repair-ecp.md",
+  "changes": [
+    {
+      "path": "CHANGELOG.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "README.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "bin/agentctl",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "bin/hardwarectl",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "bin/projectctl",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "bin/scmctl",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "bin/testctl",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "config/policy.json",
+      "requirements": [
+        "REQ-AUTO-003"
+      ]
+    },
+    {
+      "path": "docs/architecture.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "docs/automation.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "docs/commands.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "docs/design/automation-repair-ecp.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "docs/operations.md",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "examples/automation.json",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "examples/scm-bitbucket.json",
+      "requirements": [
+        "REQ-AUTO-004",
+        "REQ-AUTO-005"
+      ]
+    },
+    {
+      "path": "examples/scm-github.json",
+      "requirements": [
+        "REQ-AUTO-004",
+        "REQ-AUTO-005"
+      ]
+    },
+    {
+      "path": "providers/codex/driver.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "schemas/contracts.schema.json",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "scripts/benchmark_graph.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "scripts/build_environments.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "scripts/generate_projection.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "scripts/verify_release.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/automation.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/cli.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/contracts.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/data/contracts.schema.json",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/data/policy.json",
+      "requirements": [
+        "REQ-AUTO-003"
+      ]
+    },
+    {
+      "path": "src/agent_framework/docker_backend.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/engine.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002",
+        "REQ-AUTO-003",
+        "REQ-AUTO-004",
+        "REQ-AUTO-005",
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/remote.py",
+      "requirements": [
+        "REQ-AUTO-004",
+        "REQ-AUTO-005"
+      ]
+    },
+    {
+      "path": "src/agent_framework/roles.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002"
+      ]
+    },
+    {
+      "path": "src/agent_framework/runtime_profile.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "src/agent_framework/scm.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "tests/test_automation_concurrency.py",
+      "requirements": [
+        "REQ-AUTO-001",
+        "REQ-AUTO-002"
+      ]
+    },
+    {
+      "path": "tests/test_codex_transport.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "tests/test_extended_gates.py",
+      "requirements": [
+        "REQ-AUTO-003"
+      ]
+    },
+    {
+      "path": "tests/test_remote_providers.py",
+      "requirements": [
+        "REQ-AUTO-004",
+        "REQ-AUTO-005"
+      ]
+    },
+    {
+      "path": "tests/test_runtime_profile.py",
+      "requirements": [
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": "tests/test_trace_provenance.py",
+      "requirements": [
+        "REQ-AUTO-006",
+        "REQ-AUTO-007"
+      ]
+    },
+    {
+      "path": ".agent/design/automation-repair-trace.json",
+      "requirements": [
+        "REQ-AUTO-001"
+      ]
+    }
+  ]
+}

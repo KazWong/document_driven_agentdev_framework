@@ -16,7 +16,7 @@ from conftest import (
 )
 
 
-def test_r2_requires_safety_review_and_distinct_release_approvals(workflow):
+def test_r2_requires_safety_review_and_one_release_approver(workflow):
     e, _, suite = workflow
     p = plan()
     p["risk_class"] = "R2"
@@ -33,10 +33,9 @@ def test_r2_requires_safety_review_and_distinct_release_approvals(workflow):
     e.accept()
     value = e.work["acceptance"]["digest"]
     e.approve("person-one", value, release=True)
-    assert e.work["state"] == "ACCEPTED"
+    assert e.work["state"] == "RELEASE_APPROVED"
     with pytest.raises(FrameworkError):
         e.approve("person-one", value, release=True)
-    e.approve("person-two", value, release=True)
     e.promote()
 
 

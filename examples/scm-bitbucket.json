@@ -1,0 +1,7 @@
+{
+  "provider": "bitbucket",
+  "repository": "workspace/repository",
+  "base_branch": "main",
+  "required_checks": ["tests"],
+  "human_reviewers": ["{replace-with-reviewer-uuid}"]
+}

@@ -61,6 +61,7 @@ class Roles:
         readonly_tests: Path | None = None,
         includes_independent: bool = False,
         development_suite: dict[str, Any] | None = None,
+        accept_guard=None,
     ) -> dict[str, Any]:
         policy = role_policy(name)
         protected = protected or {}
@@ -76,7 +77,7 @@ class Roles:
         input_digest = digest(basis)
         job_id = "JOB-" + uuid.uuid4().hex.upper()
         with (
-            locked(self.store.root / "agent-job.lock"),
+            locked(self.store.root / ("agent-job-" + name + ".lock")),
             self.environments.lease(generation, job_id) as env,
         ):
             backend = self.environments.backend(env["backend"])
@@ -225,8 +226,10 @@ class Roles:
                             "Coder output changes an unapproved or Tester-owned path: "
                             + path
                         )
-                with self.store.transaction():
-                    if self.repo.head != expected_head or not self.repo.clean():
+                with locked(self.store.root / "controller.lock"), self.store.transaction():
+                    if accept_guard is not None:
+                        accept_guard()
+                    if self.repo.head != expected_head or (writable and not self.repo.clean()):
                         raise Conflict(
                             "checkout changed during role execution; output remains unapplied"
                         )

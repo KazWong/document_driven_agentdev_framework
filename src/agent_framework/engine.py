@@ -263,6 +263,11 @@ class Engine:
                     for x in (bp_ref, plan_ref, policy_ref, work["request"])
                 ],
             )
+            if work.get("candidate") and self.repo.clean():
+                prior_candidate = self.store.resolve(work["candidate"])["payload"]
+                if self.repo.head == prior_candidate["sha"]:
+                    work["implementation_head"] = self.repo.head
+                    work["prior_implementation_trace"] = prior_candidate["trace"]["changes"]
             work.update(
                 {
                     "state": "DRAFT",
@@ -279,6 +284,8 @@ class Engine:
             for key in (
                 "package",
                 "suite",
+                "test_design_job",
+                "test_design_suite",
                 "bindings",
                 "provider_feasibility",
                 "tester_feasibility",
@@ -542,7 +549,7 @@ class Engine:
         return ref
 
     def approve(
-        self, actor: str, expected_digest: str, *, release: bool = False
+        self, actor: str, expected_digest: str, *, release: bool = False, delivery: Any = None
     ) -> dict[str, Any]:
         actor = actor.strip().casefold()
         if not actor.strip():
@@ -555,8 +562,19 @@ class Engine:
             self._current(ref)
             if ref["digest"] != expected_digest:
                 raise Conflict("approval digest does not match the reviewable artifact")
+            remote_review = None
             if release:
                 self._gate(work)
+                plan = self._current(work["plan"])
+                if plan["delivery"] == "scm":
+                    from .remote import delivery_for
+                    adapter = delivery or delivery_for(self.repo, plan["scm"])
+                    pr = self._current(work["pull_request"])
+                    candidate_sha = self._current(work["candidate"])["sha"]
+                    adapter.ci(pr, candidate_sha, plan["scm"]["required_checks"])
+                    remote_review = adapter.review(pr, candidate_sha)
+                    if remote_review["actor"].strip().casefold() != actor:
+                        raise Conflict("release approver must match the verified remote human review")
             key = "release_approvals" if release else "approvals"
             if any(self._current(r)["actor"] == actor for r in work[key]):
                 raise FrameworkError("the same person cannot count as two approvers")
@@ -568,6 +586,7 @@ class Engine:
                     "actor": actor,
                     "subject": ref,
                     "purpose": "release" if release else "implementation",
+                    "remote_review": remote_review,
                 },
                 [(ref["id"], "approved_as_part_of")],
             )
@@ -628,7 +647,7 @@ class Engine:
             ).resolve()
             if (
                 source_common != candidate_common
-                or candidate_repo.head != work["base_sha"]
+                or candidate_repo.head != work.get("implementation_head", work["base_sha"])
                 or candidate_repo.branch() != expected_branch
                 or not candidate_repo.clean()
             ):
@@ -685,6 +704,8 @@ class Engine:
                 self.store, work["suite"], self.repo.path, include_independent=False
             )
             trace_changes = list(trace_changes)
+            if any(c["path"] in protected for c in trace_changes):
+                raise FrameworkError("Coder trace must not claim Tester-owned paths")
             traced = {x["path"] for x in trace_changes}
             tracked = self.repo.files(work["base_sha"])
             for case_ref in self._current(work["suite"])["cases"]:
@@ -718,7 +739,9 @@ class Engine:
                 )
 
             def check_tree(tree: str) -> None:
-                nonlocal intent_path
+                nonlocal intent_path, trace_changes
+                actual_paths = set(self.repo.diff(work["base_sha"], tree))
+                trace_changes = [c for c in trace_changes if c["path"] in actual_paths]
                 preview = {
                     "role": "coder",
                     "artifact_type": "implementation_trace",
@@ -1121,7 +1144,7 @@ class Engine:
                         self._save(work)
                     return ref
 
-    def _matrix(self, work: dict[str, Any], final: bool) -> list[dict[str, Any]]:
+    def _matrix(self, work: dict[str, Any], final: bool, *, only_environment=None) -> list[dict[str, Any]]:
         candidate = self._candidate_gate(work)
         bp = self._current(work["blueprint"])
         envs = (
@@ -1134,6 +1157,10 @@ class Engine:
             if final
             else [x["id"] for x in bp["verification_obligations"] if x["required"]]
         )
+        if only_environment is not None:
+            if only_environment not in envs:
+                raise Conflict("environment is not part of the required matrix")
+            envs = [only_environment]
         selected = []
         for environment_id in envs:
             binding = self._current(work["bindings"][environment_id])
@@ -1323,7 +1350,7 @@ class Engine:
             raise FrameworkError(
                 "remote publication requires an explicit operator identity"
             )
-        from .remote import GitHubDelivery
+        from .remote import delivery_for
 
         with locked(self.lockfile), self.store.transaction():
             work = self._need("ACCEPTED")
@@ -1331,7 +1358,7 @@ class Engine:
             plan = self._current(work["plan"])
             if plan["delivery"] != "scm":
                 raise Conflict("the ECP does not authorize SCM delivery")
-            value = (delivery or GitHubDelivery(self.repo)).publish(
+            value = (delivery or delivery_for(self.repo, self._current(work["plan"])["scm"])).publish(
                 self._current(work["candidate"])["sha"],
                 plan["scm"]["base_branch"],
                 title,
@@ -1348,13 +1375,21 @@ class Engine:
             self._advance(work, "publish_pull_request", "framework")
             return ref
 
+    def sync_remote_review(self, *, delivery=None):
+        from .remote import delivery_for
+        work = self._need("CI_VERIFIED")
+        plan = self._current(work["plan"])
+        adapter = delivery or delivery_for(self.repo, plan["scm"])
+        review = adapter.review(self._current(work["pull_request"]), self._current(work["candidate"])["sha"])
+        return self.approve(review["actor"], work["acceptance"]["digest"], release=True, delivery=adapter)
+
     def record_ci(self, *, delivery: Any = None) -> dict[str, Any]:
-        from .remote import GitHubDelivery
+        from .remote import delivery_for
 
         with locked(self.lockfile), self.store.transaction():
             work = self._need("PR_OPEN")
             self._gate(work)
-            value = (delivery or GitHubDelivery(self.repo)).ci(
+            value = (delivery or delivery_for(self.repo, self._current(work["plan"])["scm"])).ci(
                 self._current(work["pull_request"]),
                 self._current(work["candidate"])["sha"],
                 self._current(work["plan"])["scm"]["required_checks"],
@@ -1402,10 +1437,10 @@ class Engine:
                         raise FrameworkError(
                             "SCM promotion requires --authorize-remote"
                         )
-                    from .remote import GitHubDelivery
+                    from .remote import delivery_for
 
                     self._current(work["ci"])
-                    remote = (delivery or GitHubDelivery(self.repo)).promote(
+                    remote = (delivery or delivery_for(self.repo, self._current(work["plan"])["scm"])).promote(
                         self._current(work["pull_request"]),
                         self._current(work["candidate"])["sha"],
                         self._current(work["plan"])["scm"]["required_checks"],
@@ -1441,9 +1476,23 @@ class Engine:
 
     def close(self) -> None:
         with locked(self.lockfile), self.store.transaction():
-            self._advance(self._need("PROMOTED"), "close", "human")
+            self._advance(self._need("PROMOTED"), "close", "framework")
 
-    def run_role(
+    def run_role(self, name, generation, action_id, *, suite_ref=None):
+        return self._prepare_role(name, generation, action_id, suite_ref=suite_ref)()
+
+    def _role_guard(self, before, name):
+        current = self.work
+        allowed = {before["state"]}
+        if before["state"] == "PROVIDER_FEASIBLE":
+            allowed.add("TESTER_FEASIBLE")
+        if current["state"] not in allowed:
+            raise Conflict("workflow stage changed during role execution")
+        for key in ("request", "draft", "package", "candidate"):
+            if before.get(key) != current.get(key):
+                raise Conflict("role inputs changed during execution: " + key)
+
+    def _prepare_role(
         self,
         name: str,
         generation: str,
@@ -1454,7 +1503,7 @@ class Engine:
         """Derive minimal current inputs. Callers cannot supply a custom hidden-data context."""
         with locked(self.lockfile):
             work = self.work
-            if name == "planner" and work["state"] == "INTAKE":
+            if name == "planner" and work["state"] in {"INTAKE", "REPLAN_REQUIRED"}:
                 context = {
                     "state": "INTAKE",
                     "request": self._current(work["request"]),
@@ -1463,15 +1512,17 @@ class Engine:
                         if self.store.exists("PROJECT-BLUEPRINT")
                         else None
                     ),
+                    "prior_failure": self._current(work["failures"][-1]) if work["failures"] else None,
                     "expected_output": "planning_draft",
                     "instructions": "Propose a concrete Blueprint, Plan and consequence assessment. Preserve original identities; record any splits, merges or retirements with lineage.",
                 }
-                return self.roles.run(
+                return lambda: self.roles.run(
                     name,
                     generation,
                     action_id,
                     context,
                     inputs=[work["request"]],
+                    accept_guard=lambda: self._role_guard(work, name),
                     approved_permissions=work["intake_permissions"],
                 )
             inputs = [work["draft"]]
@@ -1501,6 +1552,14 @@ class Engine:
                 else:
                     inputs += [suite_ref]
                     context["test_design_ref"] = suite_ref
+            elif name == "coder" and work["state"] == "PROVIDER_FEASIBLE":
+                inputs += [work["provider_feasibility"]]
+                context["handoff_ref"] = work["draft"]
+                context["expected_output"] = "implementation_feasibility"
+                context["instructions"] = (
+                    "Assess implementation feasibility against the Plan concurrently with Tester test design. "
+                    "This is preliminary: no production writes. A separate test handoff review is mandatory before coding."
+                )
             elif name == "coder" and work["state"] == "TESTER_FEASIBLE":
                 inputs += [work["tester_feasibility"]]
                 context["handoff_ref"] = work["tester_feasibility"]
@@ -1518,6 +1577,13 @@ class Engine:
                 inputs += [work["package"]]
                 scope = context["plan"]["scope"]
                 context["implementation_tasks"] = context["plan"]["tasks"]
+                context["prior_implementation_trace"] = work.get("prior_implementation_trace", [])
+                if work["failures"]:
+                    context["repair_failure"] = self.store.resolve(work["failures"][-1])["payload"]
+                    context["repair_result"] = self.store.resolve(context["repair_failure"]["result"])["payload"]
+                    context["repair_guidance"] = "Fix production within the approved scope; do not modify tests or weaken obligations."
+                context["development_handoff"] = work["tester_feasibility"]
+
             elif name == "tester" and work["state"] == "CANDIDATE":
                 results = self._matrix(work, False)
                 inputs += [work["candidate"], *results]
@@ -1527,7 +1593,23 @@ class Engine:
                 name in {"reviewer", "safety_reviewer"} and work["state"] == "VERIFIED"
             ):
                 inputs += [work[x] for x in ("candidate", "package", "tester_verdict")]
-                context["implementation_trace"] = self._candidate_gate(work)["trace"]
+                candidate = self._candidate_gate(work)
+                context["candidate_trace"] = candidate["trace"]
+                context["implementation_trace"] = {
+                    **candidate["trace"],
+                    "changes": [c for c in candidate["trace"]["changes"]
+                                if c["path"] not in development_hashes(self.store, work["suite"])],
+                }
+                context["test_provenance"] = {
+                    "author": "tester", "materializer": "framework",
+                    "suite_ref": work["suite"],
+                    "development_hashes": development_hashes(self.store, work["suite"]),
+                }
+                context["review_output_contract"] = (
+                    "findings lists unresolved defects only; approved requires findings=[]. "
+                    "Put resolved issues and positive explanations in optional notes, never findings. Never suppress genuine defects. "
+                    "candidate_trace includes controller-materialized Tester files; it is not Coder authorship."
+                )
                 context["tester_verdict"] = self._current(work["tester_verdict"])[
                     "output"
                 ]
@@ -1548,39 +1630,43 @@ class Engine:
             else:
                 raise Conflict("role is not required at this workflow stage")
             suite_ref = suite_ref or work.get("suite")
-            with tempfile.TemporaryDirectory(
-                prefix="role-tests-", dir=self.store.root
-            ) as tmp:
-                root = Path(tmp)
-                if suite_ref:
-                    materialize(
-                        self.store,
-                        suite_ref,
-                        root,
-                        include_independent=include_independent,
+            def execute():
+                with tempfile.TemporaryDirectory(
+                    prefix="role-tests-", dir=self.store.root
+                ) as tmp:
+                    root = Path(tmp)
+                    if suite_ref:
+                        materialize(
+                            self.store,
+                            suite_ref,
+                            root,
+                            include_independent=include_independent,
+                        )
+                    return self.roles.run(
+                        name,
+                        generation,
+                        action_id,
+                        context,
+                        inputs=inputs,
+                        accept_guard=lambda: self._role_guard(work, name),
+                        approved_permissions=(
+                            context["plan"]["permissions"]
+                            if work["approvals"]
+                            else work["intake_permissions"]
+                        ),
+                        scope=scope,
+                        protected=(
+                            development_hashes(self.store, suite_ref) if suite_ref else {}
+                        ),
+                        readonly_tests=root,
+                        includes_independent=include_independent,
+                        development_suite=suite_ref,
                     )
-                return self.roles.run(
-                    name,
-                    generation,
-                    action_id,
-                    context,
-                    inputs=inputs,
-                    approved_permissions=(
-                        context["plan"]["permissions"]
-                        if work["approvals"]
-                        else work["intake_permissions"]
-                    ),
-                    scope=scope,
-                    protected=(
-                        development_hashes(self.store, suite_ref) if suite_ref else {}
-                    ),
-                    readonly_tests=root,
-                    includes_independent=include_independent,
-                    development_suite=suite_ref,
-                )
+
+            return execute
 
     def import_planning(self, reference: dict[str, Any]) -> dict[str, Any]:
-        work = self._need("INTAKE")
+        work = self._need("INTAKE", "REPLAN_REQUIRED")
         value = self._role_output(reference, "planner", [work["request"]])
         if value["artifact_type"] != "planning_draft":
             raise FrameworkError("initial planning requires a semantic planning draft")
@@ -1591,6 +1677,9 @@ class Engine:
 
         with locked(self.lockfile), self.store.transaction():
             work = self._need("PROVIDER_FEASIBLE")
+            if work.get("test_design_job") == reference:
+                self._current(work["test_design_suite"])
+                return work["test_design_suite"]
             value = self._role_output(
                 reference, "tester", [work["draft"], work["provider_feasibility"]]
             )
@@ -1620,7 +1709,7 @@ class Engine:
                 for x in self._current(work["blueprint"])["verification_obligations"]
                 if x["required"]
             ]
-            return suite(
+            suite_ref = suite(
                 self.store,
                 key,
                 refs,
@@ -1630,6 +1719,9 @@ class Engine:
                     self.store.head(key)["revision"] if self.store.exists(key) else 0
                 ),
             )
+            work.update(test_design_job=reference, test_design_suite=suite_ref)
+            self._save(work)
+            return suite_ref
 
     def _fail(
         self,
@@ -1675,12 +1767,18 @@ class Engine:
             )
             self._save(work)
 
-    def resume(self, actor: str, *, repair_source: bool = False) -> None:
+    def resume(self, actor: str, *, repair_source: bool = False, automatic_budget: int | None = None) -> None:
         if not actor.strip():
             raise FrameworkError("human resume authorization is required")
         with locked(self.lockfile), self.store.transaction():
             work = self._need("BLOCKED")
             failure = self._current(work["failures"][-1])
+            if automatic_budget is not None:
+                if type(automatic_budget) is not int or not 0 <= automatic_budget <= 10:
+                    raise FrameworkError("invalid automatic repair budget")
+                if work.get("automatic_repairs", 0) >= automatic_budget:
+                    raise Conflict("automatic repair budget exhausted")
+                work["automatic_repairs"] = work.get("automatic_repairs", 0) + 1
             self._package_gate(work)
             work["state"] = "IMPLEMENTING" if repair_source else failure["resume_state"]
             if repair_source:
@@ -1696,6 +1794,6 @@ class Engine:
                     "work": self.work_id,
                     "actor": actor,
                     "repair_source": repair_source,
-                    "automatic_retry_budget": 0,
+                    "automatic_retry_budget": automatic_budget or 0,
                 },
             )

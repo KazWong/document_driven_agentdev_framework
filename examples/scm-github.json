@@ -1,0 +1,7 @@
+{
+  "provider": "github",
+  "repository": "owner/repository",
+  "base_branch": "main",
+  "required_checks": ["tests"],
+  "human_reviewers": ["replace-with-human-login"]
+}

@@ -1,0 +1,10 @@
+{
+  "generation": "ENV-AGENT",
+  "role_action": "role",
+  "selections": {"ENVREQ-001": "ENV-TEST"},
+  "verify_actions": {"ENVREQ-001": "verify"},
+  "repair_budget": 2,
+  "authorize_remote": true,
+  "actor": "framework-operator",
+  "title": "Implement the approved work item"
+}

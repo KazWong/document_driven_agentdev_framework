@@ -18,7 +18,7 @@ Planner proposes a Blueprint and separate Plan. The Blueprint retains stable REQ
 
 Semantic edits create unapproved revisions and invalidate dependent evidence. Candidate creation runs on a controller-owned feature worktree. The controller checks the actual Git diff against scope and requirement/design/task traces, materializes Tester-owned development tests, checks the prospective tree, then commits. The original source checkout is preserved. A durable candidate intent supports recovery if a process stops after the Git commit but before its ledger record.
 
-Targeted execution stamps candidate SHA, suite digest, generation, immutable image and execution identity. Tester provides the typed verification verdict. Reviewer assesses the exact candidate; R2/R3 also require Safety Reviewer. A distinct final run covers every required environment cell and existing VER obligation. Targeted results cannot stand in for final acceptance. Promotion rechecks current dependencies, exact clean candidate, reviews, matrix and human approvals while holding environment leases. R0/R1 require one release approval; R2/R3 require two distinct identities.
+Targeted execution stamps candidate SHA, suite digest, generation, immutable image and execution identity. Tester provides the typed verification verdict. Reviewer assesses the exact candidate; R2/R3 also require Safety Reviewer. A distinct final run covers every required environment cell and existing VER obligation. Targeted results cannot stand in for final acceptance. Promotion rechecks current dependencies, exact clean candidate, reviews, matrix and human approvals while holding environment leases. R0–R3 require one human release approver. SCM human review is imported from the current GitHub or Bitbucket Cloud PR. See `design/automation-repair-ecp.md` for the user-authorized policy revision.
 
 Known failure classes route to their owner. Ambiguous, conflicting or repeated equivalent failures invoke read-only Debugger. Automatic retry budget is zero. Diagnosis grants no approval; an operator explicitly resumes work. Source repair clears the candidate and candidate-bound acceptance rather than relabelling old evidence.
 
@@ -45,3 +45,7 @@ Artifact delivery records local promotion after the same gates. Optional GitHub 
 Static bounded graph queries provide JSON, Mermaid and standalone SVG views, including baselines and failure causes. Normal queries use the current frontier rather than loading all archived revisions. The release measurements exercise 1k/10k/100k live nodes and one million total revisions. Full live Docker/agent isolation, image acceptance and framework self-promotion remain release gates to execute on a provisioned host.
 
 Interactive VS Code, public IPC, full asynchronous scheduling, provider catalogs, authenticated/encrypted ledgers, a host broker, HIL redesign and automated self-updates are outside this initial implementation. The accepted previous controller and original v2.0.3 baseline remain the recovery boundary for this delivery.
+
+## Automation repair
+
+Tester test authoring and Coder preliminary feasibility overlap in isolated role jobs. Code implementation requires the subsequent concrete test handoff. Controller locks cover preparation/application, not model execution. `run --watch` drives the resumable lifecycle; see [automation.md](automation.md).

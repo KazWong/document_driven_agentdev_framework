@@ -72,3 +72,7 @@ Create a baseline only at a stable frontier: `baseline BASE-ID 'label' --compact
 Point migration at a legacy **records directory**, excluding credentials, not an entire development checkout. `migrate LEGACY TARGET` is a nonmutating inventory and conversion plan. Review its digest, then `migrate LEGACY TARGET --apply --digest INPUT-DIGEST`. Conversion is copy-on-write, preserves exact source bytes/modes as historical artifacts and creates unresolved DRAFT state. Old approvals and successful results never become current v2.1 authority.
 
 Interrupted imports resume using matching source bytes. Recovery handles an interruption between state-directory rename and controller-pointer write. `rollback TARGET --actor operator` selects the original legacy state and preserves the new history. Reapplying the completed conversion does not undo an explicit rollback. Maintain existing product source with a fresh Blueprint/Plan that reconciles its real tracked files and target requirements; no obsolete language/lane classification is needed.
+
+## Automated workflow and revised review policy
+
+Use [automation.md](automation.md) for `run --watch`, automatic imports, bounded repair and remote human review. All risks require one human per gate. SCM plans must name provider, repository and an allowed-human list in addition to base/checks. GitHub and Bitbucket Cloud are supported. Historical step-by-step commands above remain available for inspection and recovery.

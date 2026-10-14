@@ -228,6 +228,8 @@ def validate_trace(
     for change in changes:
         if not in_scope(change["path"], plan["scope"]):
             raise FrameworkError("diff leaves the approved scope")
+        allowed_requirements = set()
+        allowed_design = set()
         for task_id in change["task_ids"]:
             task = tasks.get(task_id)
             if not task or not in_scope(
@@ -236,9 +238,11 @@ def validate_trace(
                 raise FrameworkError(
                     "trace path does not implement its cited Plan task"
                 )
-            if not set(change["requirement_ids"]) <= set(
-                task["requirements"]
-            ) or not set(change["design_ids"]) <= set(task["design"]):
-                raise FrameworkError(
-                    "trace requirement/design mapping contradicts the Plan"
-                )
+            allowed_requirements.update(task["requirements"])
+            allowed_design.update(task["design"])
+        if not set(change["requirement_ids"]) <= allowed_requirements or not set(
+            change["design_ids"]
+        ) <= allowed_design:
+            raise FrameworkError(
+                "trace requirement/design mapping contradicts the Plan"
+            )

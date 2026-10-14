@@ -18,8 +18,9 @@ class DockerBackend:
     name = "docker"
     authoritative = True
 
-    def __init__(self, executor: ProcessExecutor | None = None):
+    def __init__(self, executor: ProcessExecutor | None = None, *, runtime_profile: Path | None = None):
         self.executor = executor or ProcessExecutor()
+        self.runtime_profile = runtime_profile
 
     def _call(self, args: list[str], **kwargs: Any):
         return self.executor.run(["docker", *args], **kwargs)
@@ -189,8 +190,11 @@ class DockerBackend:
                 "--mount",
                 f"type=bind,src={path},dst=/project/{safe_relative(rel)},readonly",
             ]
+        from .runtime_profile import security_options
+        profile_options = security_options(self.runtime_profile, request)
         args = [
             "create",
+            *profile_options,
             "--name",
             name,
             "--init",
@@ -212,7 +216,7 @@ class DockerBackend:
             "--tmpfs",
             "/tmp:rw,noexec,nosuid,size=64m",
             "--tmpfs",
-            "/work:rw,nosuid,size=256m,mode=1777",
+            "/work:rw,exec,nosuid,nodev,size=256m,mode=1777",
             "--workdir",
             request.workdir,
             "--env",

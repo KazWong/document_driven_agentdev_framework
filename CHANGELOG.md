@@ -1,3 +1,7 @@
+## Unreleased — v2.1.0 automation repair (2026-10-13)
+
+Concurrent Tester/Coder preflight; resumable run/watch driver; one human per approval gate for all risks; GitHub and Bitbucket Cloud branch/PR/CI/review integration; provenance, trace union, Codex transport and executable workspace fixes. Host-verified candidate; live environment and remote acceptance pending.
+
 # 2.1.0 — clean architecture candidate
 
 - Replace the legacy runtime with the `agent_framework` package and five operator entrypoints.

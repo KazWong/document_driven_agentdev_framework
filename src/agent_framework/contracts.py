@@ -111,7 +111,7 @@ def validate_plan(plan: dict[str, Any], bp: dict[str, Any]) -> None:
     if plan["delivery"] == "scm":
         scm = plan.get("scm", {})
         if (
-            set(scm) != {"base_branch", "required_checks"}
+            not {"base_branch", "required_checks"} <= set(scm)
             or not scm["base_branch"]
             or not scm["required_checks"]
             or len(scm["required_checks"]) != len(set(scm["required_checks"]))

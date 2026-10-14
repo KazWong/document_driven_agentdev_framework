@@ -1,10 +1,14 @@
-# AI Agent Framework 2.1.0
+# AI Agent Framework 2.1.0 — automation repair candidate
 
 A clean implementation of the approved v2.1 architecture: revision-bound engineering packages, isolated roles, immutable candidates, managed environments, traceable evidence and mandatory final acceptance.
 
 **Delivery status: release candidate.** The accompanying verification report records host tests, graph measurements, wheel installation and patch reconstruction. Docker image builds, authenticated Codex roles and independent live acceptance have not run in the delivery workspace. The archive contains source and environment definitions, not prebuilt or accepted images.
 
 The package name is `ai-agent-framework`; Python code lives in `agent_framework`. Architecture principles use `P-*`; the sole decision register uses `D-001` through `D-043`. Legacy runtime code is replaced. Existing product repositories are preserved, with an explicit historical-state importer.
+
+## Automation repair
+
+See [the revised design and defect scope](docs/design/automation-repair-ecp.md) and [run/watch instructions](docs/automation.md). This candidate adds concurrent preflight, resumable orchestration, one human per gate at every risk, and GitHub/Bitbucket Cloud review delivery. Historical verification reports describe their original source only.
 
 ## Install and inspect
 

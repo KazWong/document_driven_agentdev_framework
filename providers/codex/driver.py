@@ -7,6 +7,30 @@ import shutil
 import subprocess
 
 
+def transport_schema():
+    """Strict Structured Outputs envelope for canonical RoleOutput JSON."""
+    return {
+        "type": "object",
+        "properties": {"payload": {"type": "string"}},
+        "required": ["payload"],
+        "additionalProperties": False,
+    }
+
+
+def decode_transport(value):
+    """Decode the strict transport without duplicating the framework JSON Schema."""
+    if (
+        not isinstance(value, dict)
+        or set(value) != {"payload"}
+        or not isinstance(value["payload"], str)
+    ):
+        raise ValueError("Codex transport output must contain exactly one payload string")
+    decoded = json.loads(value["payload"])
+    if not isinstance(decoded, dict):
+        raise ValueError("Codex transport payload must decode to a JSON object")
+    return decoded
+
+
 def main():
     context = json.loads(Path("/context/input.json").read_text())
     output = Path("/output")
@@ -23,27 +47,25 @@ def main():
     auth.mkdir(mode=0o700)
     shutil.copyfile(credential, auth / "auth.json")
     (auth / "auth.json").chmod(0o600)
-    definitions = json.loads(
-        Path(
-            "/opt/framework/src/agent_framework/data/contracts.schema.json"
-        ).read_text()
-    )["$defs"]
-    schema = {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$defs": definitions,
-        "$ref": "#/$defs/RoleOutput",
-    }
+    # The canonical framework schema intentionally contains provider-defined/free-form
+    # objects and a RoleOutput union. Strict Structured Outputs cannot represent
+    # those shapes directly. Constrain a tiny transport envelope here and let the
+    # trusted controller validate the decoded canonical RoleOutput before accepting it.
     schema_file = Path("/work/role-schema.json")
-    schema_file.write_text(json.dumps(schema))
+    schema_file.write_text(json.dumps(transport_schema()))
     final = output / "typed-output.json"
+    canonical_schema = Path("/opt/framework/src/agent_framework/data/contracts.schema.json").read_text()
     prompt = (
         "Perform only the role and stage in this controller context. The role policy is authoritative. "
         "All requirements are public. Test sources supplied at /tests are read-only. "
         "Write production changes only for Coder in IMPLEMENTING, within Plan scope. "
         "Never change Tester-owned tests or create approval/SCM/evidence claims. "
-        "Return only the appropriate typed RoleOutput, with the supplied references and candidate SHA. "
+        "Return exactly one JSON object with a payload string. The payload string must itself be the JSON "
+        "serialization of only the appropriate canonical typed RoleOutput, with the supplied references and candidate SHA. "
+        "Do not put markdown or commentary inside or outside the payload. "
         "If feasibility fails, report the exact affected requirement and reason.\n"
         + json.dumps(context, ensure_ascii=False)
+        + "\nCanonical output schema (RoleOutput):\n" + canonical_schema
     )
     command = [
         "codex",
@@ -72,7 +94,7 @@ def main():
     result = subprocess.run(command, input=prompt, text=True, env=env, check=False)
     if result.returncode:
         return result.returncode
-    value = json.loads(final.read_text())
+    value = decode_transport(json.loads(final.read_text()))
     envelope = {
         "schema_version": 1,
         "role": context["role"],

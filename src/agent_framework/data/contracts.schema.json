@@ -966,7 +966,8 @@
             "minLength": 1
           },
           "minItems": 0,
-          "uniqueItems": true
+          "uniqueItems": true,
+          "description": "Unresolved defects or blockers only. Resolved findings and positive explanations belong in notes."
         },
         "failure_class": {
           "enum": [
@@ -979,6 +980,12 @@
             "transient_failure",
             "unknown_failure"
           ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -1021,7 +1028,8 @@
             "minLength": 1
           },
           "minItems": 0,
-          "uniqueItems": true
+          "uniqueItems": true,
+          "description": "Unresolved defects or blockers only. Resolved findings and positive explanations belong in notes."
         },
         "failure_class": {
           "enum": [
@@ -1034,6 +1042,12 @@
             "transient_failure",
             "unknown_failure"
           ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -1477,6 +1491,25 @@
                 "minLength": 1
               },
               "minItems": 1
+            },
+            "provider": {
+              "enum": [
+                "github",
+                "bitbucket"
+              ]
+            },
+            "repository": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+            },
+            "human_reviewers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           "required": [

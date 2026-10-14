@@ -62,6 +62,7 @@ def parser() -> argparse.ArgumentParser:
         "--environments", type=Path, help="shared environment registry directory"
     )
     p.add_argument("--work", default="WORK-001")
+    p.add_argument("--docker-runtime-profile", type=Path, help="operator-owned sandbox compatibility proof/config")
     p.add_argument(
         "--json", action="store_true", help="emit the canonical machine projection"
     )
@@ -100,6 +101,12 @@ def parser() -> argparse.ArgumentParser:
     q.add_argument("--generation", required=True)
     q.add_argument("--action", required=True)
     q.add_argument("--suite")
+    q = sub.add_parser("run", help="resume automatic lifecycle until human review or a diagnosed blocker")
+    q.add_argument("--config", type=Path, required=True)
+    q.add_argument("--watch", action="store_true")
+    q.add_argument("--timeout", type=int, default=3600)
+    q.add_argument("--poll-seconds", type=int, default=15)
+    sub.add_parser("sync-review", help="import the current GitHub/Bitbucket human approval")
     q = sub.add_parser("approve")
     q.add_argument("--actor", required=True)
     q.add_argument("--digest", required=True)
@@ -216,7 +223,7 @@ def parser() -> argparse.ArgumentParser:
 
 
 def execute(a: argparse.Namespace) -> Any:
-    backend = DockerBackend()
+    backend = DockerBackend(runtime_profile=a.docker_runtime_profile)
     if a.command == "doctor":
         return {
             "framework": __version__,
@@ -411,6 +418,12 @@ def execute(a: argparse.Namespace) -> Any:
                 include_independent=a.include_independent,
             )
         engine = Engine(Repository(a.project), store, environments, a.work)
+        if a.command == "run":
+            from .automation import Automation
+            automation = Automation(engine, read_json(a.config))
+            return automation.watch(timeout=a.timeout, poll_seconds=a.poll_seconds) if a.watch else automation.run()
+        if a.command == "sync-review":
+            return engine.sync_remote_review()
         if a.command == "env-publish":
             release = read_json(a.release)
             return environments.register_release(
