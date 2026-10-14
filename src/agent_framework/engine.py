@@ -12,6 +12,7 @@ from typing import Any
 from .common import (
     Conflict,
     FrameworkError,
+    RoleOutputRejected,
     bytes_digest,
     canonical,
     contained,
@@ -170,12 +171,15 @@ class Engine:
         )
 
     def propose(
-        self, blueprint: dict[str, Any], plan: dict[str, Any], consequences: list[str]
+        self, blueprint: dict[str, Any], plan: dict[str, Any], consequences: list[str],
+        *, _expected_work: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         with locked(self.lockfile), self.store.transaction():
             work = self.work
             if work["state"] in {"PROMOTED", "CLOSED"}:
                 raise Conflict("create new work to change a promoted project")
+            if _expected_work is not None:
+                self._role_guard(_expected_work, 'planner')
             previous = (
                 self.store.get(work["blueprint"]["id"], work["blueprint"]["revision"])[
                     "payload"
@@ -386,7 +390,25 @@ class Engine:
         validate("RoleOutput", value["output"])
         return value["output"]
 
-    def tester_preflight(
+    def _preflight_import(self, reference, owner, operation):
+        before = self.work
+        record = self.store.resolve(reference, current=True)
+        if record['kind'] != 'role_output' or record['owner'] != owner:
+            raise FrameworkError('expected a current controller-recorded ' + owner + ' output')
+        try:
+            return operation()
+        except Conflict:
+            raise
+        except FrameworkError as exc:
+            with locked(self.lockfile), self.store.transaction():
+                self._role_guard(before, owner)
+                self._replan(self.work, reference, [str(exc)])
+            raise RoleOutputRejected(str(exc), reference) from exc
+
+    def tester_preflight(self, suite_ref, role_ref):
+        return self._preflight_import(role_ref, 'tester', lambda: self._tester_preflight(suite_ref, role_ref))
+
+    def _tester_preflight(
         self, suite_ref: dict[str, Any], role_ref: dict[str, Any]
     ) -> None:
         with locked(self.lockfile), self.store.transaction():
@@ -404,6 +426,8 @@ class Engine:
             plan = self._current(work["plan"])
             for ref in tests["cases"]:
                 case = self._current(ref, "test_case")
+                if not set(case['obligations']) <= {x['id'] for x in blueprint['verification_obligations']}:
+                    raise FrameworkError('test case references an obligation outside the current Blueprint')
                 if case["visibility"] == "independent" and case["path"] in tracked:
                     raise FrameworkError(
                         "independent test sources must not be tracked in the product checkout"
@@ -435,6 +459,9 @@ class Engine:
             self._advance(work, "tester_feasible", "tester")
 
     def coder_preflight(self, role_ref: dict[str, Any]) -> None:
+        return self._preflight_import(role_ref, 'coder', lambda: self._coder_preflight(role_ref))
+
+    def _coder_preflight(self, role_ref: dict[str, Any]) -> None:
         with locked(self.lockfile), self.store.transaction():
             work = self._need("TESTER_FEASIBLE")
             output = self._role_output(
@@ -455,6 +482,9 @@ class Engine:
             self._advance(work, "coder_feasible", "coder")
 
     def reconcile(self, role_ref: dict[str, Any]) -> dict[str, Any]:
+        return self._preflight_import(role_ref, 'planner', lambda: self._reconcile(role_ref))
+
+    def _reconcile(self, role_ref: dict[str, Any]) -> dict[str, Any]:
         with locked(self.lockfile), self.store.transaction():
             work = self._need("FEASIBLE")
             output = self._role_output(
@@ -540,6 +570,8 @@ class Engine:
                 "owner": "planner",
                 "findings": findings,
                 "automatic_retry_budget": 0,
+                "result": source,
+                "resume_state": work['state'],
             },
             [(source["id"], "derived_from")],
         )
@@ -826,17 +858,42 @@ class Engine:
             intent_path.unlink(missing_ok=True)
         return ref
 
+    def pending_candidate_intents(self):
+        work = self.work
+        return [p for p in sorted(self.store.root.glob('candidate-intent-*.json'))
+                if (value := read_json(p)).get('work') == self.work_id
+                and value.get('package') == work.get('package')]
+
     def recover_candidate(self) -> dict[str, Any]:
         with locked(self.lockfile), self.store.transaction():
             work = self._need("IMPLEMENTING", "CANDIDATE")
             self._package_gate(work)
-            if (
-                not self.repo.clean()
-                or self.repo.branch() != "agent/" + self.work_id.lower()
-            ):
-                raise Conflict("recovery requires the exact clean work-item checkout")
-            tree = self.repo.git("rev-parse", "HEAD^{tree}").strip()
-            path = self.store.root / ("candidate-intent-" + tree + ".json")
+            if self.repo.branch() != 'agent/' + self.work_id.lower():
+                raise Conflict('recovery requires the exact work-item checkout')
+            pending = self.pending_candidate_intents()
+            if not pending:
+                raise Conflict('no candidate intent for the current approved work item')
+            if not self.repo.clean():
+                eligible = [(p, read_json(p)) for p in pending]
+                eligible = [(p, v) for p, v in eligible if v['expected_head'] == self.repo.head]
+                if len(eligible) != 1 or work['state'] != 'IMPLEMENTING':
+                    raise Conflict('ambiguous or stale uncommitted candidate intent')
+                path, intent = eligible[0]
+                if intent['base_sha'] != work['base_sha']:
+                    raise Conflict('candidate intent belongs to a different work-item baseline')
+                def exact_tree(tree):
+                    if tree != intent['tree']:
+                        raise Conflict('checkout differs from the exact intended candidate tree')
+                    validate_trace(self.repo, work['base_sha'], tree, intent['trace'],
+                                   self._current(work['blueprint']), self._current(work['plan']), work['package'])
+                self.repo.candidate(work['base_sha'], intent['expected_head'],
+                                    self._current(work['plan'])['scope'],
+                                    development_hashes(self.store, work['suite']),
+                                    'Implement ' + self.work_id, exact_tree)
+            tree = self.repo.git('rev-parse', 'HEAD^{tree}').strip()
+            path = self.store.root / ('candidate-intent-' + tree + '.json')
+            if path not in pending:
+                raise Conflict('clean checkout does not match a current candidate intent')
             intent = read_json(path)
             if (
                 intent["work"] != self.work_id
@@ -1478,8 +1535,26 @@ class Engine:
         with locked(self.lockfile), self.store.transaction():
             self._advance(self._need("PROMOTED"), "close", "framework")
 
-    def run_role(self, name, generation, action_id, *, suite_ref=None):
-        return self._prepare_role(name, generation, action_id, suite_ref=suite_ref)()
+    def recover_role(self):
+        from .worktree_apply import recover
+        with locked(self.lockfile):
+            return {'recovered': recover(self.store, self.repo)}
+
+    def run_role(self, name, generation, action_id, *, suite_ref=None, receipt_id=None):
+        before = self.work
+        try:
+            return self._prepare_role(name, generation, action_id, suite_ref=suite_ref, receipt_id=receipt_id)()
+        except RoleOutputRejected as exc:
+            with locked(self.lockfile), self.store.transaction():
+                self._role_guard(before, name)
+                work = self.work
+                if name in {'planner', 'tester', 'coder'} and work['state'] in {'INTAKE', 'REPLAN_REQUIRED', 'PROVIDER_FEASIBLE', 'TESTER_FEASIBLE', 'FEASIBLE'}:
+                    self._replan(work, exc.reference, [str(exc)])
+                elif name == 'coder' and work['state'] == 'IMPLEMENTING':
+                    self._fail(work, 'candidate_failed',
+                               [x['id'] for x in self._current(work['blueprint'])['verification_obligations'] if x['required']],
+                               {'head': self.repo.head, 'package': work['package']['digest']}, exc.reference)
+            raise
 
     def _role_guard(self, before, name):
         current = self.work
@@ -1488,7 +1563,7 @@ class Engine:
             allowed.add("TESTER_FEASIBLE")
         if current["state"] not in allowed:
             raise Conflict("workflow stage changed during role execution")
-        for key in ("request", "draft", "package", "candidate"):
+        for key in ("request", "draft", "package", "candidate", "failures"):
             if before.get(key) != current.get(key):
                 raise Conflict("role inputs changed during execution: " + key)
 
@@ -1499,6 +1574,7 @@ class Engine:
         action_id: str,
         *,
         suite_ref: dict[str, Any] | None = None,
+        receipt_id: str | None = None,
     ) -> dict[str, Any]:
         """Derive minimal current inputs. Callers cannot supply a custom hidden-data context."""
         with locked(self.lockfile):
@@ -1512,9 +1588,9 @@ class Engine:
                         if self.store.exists("PROJECT-BLUEPRINT")
                         else None
                     ),
-                    "prior_failure": self._current(work["failures"][-1]) if work["failures"] else None,
+                    "prior_failure": self.store.resolve(work["failures"][-1])["payload"] if work["failures"] else None,
                     "expected_output": "planning_draft",
-                    "instructions": "Propose a concrete Blueprint, Plan and consequence assessment. Preserve original identities; record any splits, merges or retirements with lineage.",
+                    "instructions": "Propose a concrete Blueprint, Plan and consequence assessment. Preserve original identities; record any splits, merges or retirements with lineage. Scope, task paths and test paths are repository-relative: tests/** is valid; /tests/** is a container mount and invalid in a Plan. Correct rejected fields without silently weakening requirements or permissions.",
                 }
                 return lambda: self.roles.run(
                     name,
@@ -1522,6 +1598,7 @@ class Engine:
                     action_id,
                     context,
                     inputs=[work["request"]],
+                    receipt_id=receipt_id,
                     accept_guard=lambda: self._role_guard(work, name),
                     approved_permissions=work["intake_permissions"],
                 )
@@ -1579,9 +1656,19 @@ class Engine:
                 context["implementation_tasks"] = context["plan"]["tasks"]
                 context["prior_implementation_trace"] = work.get("prior_implementation_trace", [])
                 if work["failures"]:
-                    context["repair_failure"] = self.store.resolve(work["failures"][-1])["payload"]
-                    context["repair_result"] = self.store.resolve(context["repair_failure"]["result"])["payload"]
-                    context["repair_guidance"] = "Fix production within the approved scope; do not modify tests or weaken obligations."
+                    failure = self.store.resolve(work['failures'][-1])['payload']
+                    # Feasibility history is not an active implementation failure.
+                    # Old records may predate the result/resume-state fields.
+                    if failure.get('class') != 'feasibility_failure':
+                        context['repair_failure'] = {k: failure[k] for k in ('class', 'owner', 'affected', 'material') if k in failure}
+                        if failure.get('result'):
+                            failed = self.store.resolve(failure['result'])['payload']
+                            result = failed.get('result', {})
+                            # Never send raw independent test logs/reviewer contents to Coder.
+                            context['repair_result'] = {k: result[k] for k in ('status', 'failure_stage', 'obligation_ids', 'test_count') if k in result}
+                            if failed.get('rejection_stage') == 'implementation_trace':
+                                context['repair_result']['validation_findings'] = failed.get('findings', [])
+                        context['repair_guidance'] = 'Fix production within the approved scope; do not modify tests or weaken obligations.'
                 context["development_handoff"] = work["tester_feasibility"]
 
             elif name == "tester" and work["state"] == "CANDIDATE":
@@ -1629,6 +1716,18 @@ class Engine:
                 ]
             else:
                 raise Conflict("role is not required at this workflow stage")
+            expected_outputs = {
+                ('tester', 'PROVIDER_FEASIBLE'): 'testability' if suite_ref else 'test_design_draft',
+                ('coder', 'PROVIDER_FEASIBLE'): 'implementation_feasibility',
+                ('coder', 'TESTER_FEASIBLE'): 'implementation_feasibility',
+                ('planner', 'FEASIBLE'): 'planning',
+                ('coder', 'IMPLEMENTING'): 'implementation_trace',
+                ('tester', 'CANDIDATE'): 'verification',
+                ('reviewer', 'VERIFIED'): 'review',
+                ('safety_reviewer', 'VERIFIED'): 'safety_review',
+                ('debugger', 'DIAGNOSING'): 'diagnosis',
+            }
+            context['expected_output'] = expected_outputs[(name, work['state'])]
             suite_ref = suite_ref or work.get("suite")
             def execute():
                 with tempfile.TemporaryDirectory(
@@ -1648,6 +1747,7 @@ class Engine:
                         action_id,
                         context,
                         inputs=inputs,
+                        receipt_id=receipt_id,
                         accept_guard=lambda: self._role_guard(work, name),
                         approved_permissions=(
                             context["plan"]["permissions"]
@@ -1670,9 +1770,20 @@ class Engine:
         value = self._role_output(reference, "planner", [work["request"]])
         if value["artifact_type"] != "planning_draft":
             raise FrameworkError("initial planning requires a semantic planning draft")
-        return self.propose(value["blueprint"], value["plan"], value["consequences"])
+        try:
+            return self.propose(value['blueprint'], value['plan'], value['consequences'], _expected_work=work)
+        except Conflict:
+            raise
+        except FrameworkError as exc:
+            with locked(self.lockfile), self.store.transaction():
+                self._role_guard(work, 'planner')
+                self._replan(self.work, reference, [str(exc)])
+            raise RoleOutputRejected(str(exc), reference) from exc
 
     def import_test_design(self, reference: dict[str, Any]) -> dict[str, Any]:
+        return self._preflight_import(reference, 'tester', lambda: self._import_test_design(reference))
+
+    def _import_test_design(self, reference: dict[str, Any]) -> dict[str, Any]:
         from .test_artifacts import publish_case, suite
 
         with locked(self.lockfile), self.store.transaction():
@@ -1685,6 +1796,9 @@ class Engine:
             )
             if value["artifact_type"] != "test_design_draft":
                 raise FrameworkError("expected a Tester-authored concrete test design")
+            declared = {x['id'] for x in self._current(work['blueprint'])['verification_obligations']}
+            if any(not set(case['obligations']) <= declared for case in value['cases']):
+                raise FrameworkError('test design references an obligation outside the current Blueprint')
             refs = []
             for index, case in enumerate(value["cases"]):
                 key = self.work_id + "-CASE-" + digest(case["path"])[:12].upper()

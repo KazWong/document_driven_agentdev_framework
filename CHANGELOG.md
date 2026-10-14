@@ -1,3 +1,7 @@
+## Unreleased - v2.1.0 repair 20261014-r1 (2026-10-14)
+
+Repair bounded Planner and preflight rejection handling, typed stage bindings, replan diagnostics, Coder trace validation before writes, crash-safe file application and atomic scheduler receipts. Recover exact candidate intents before and after Git commit. Harden explicit remote authorization, Git pathspecs/SSH forwarding/multiple destinations, Bitbucket review freshness, Docker TLS/mount paths, private state and environment retirement. Add 54 framework regression cases and a separately pinned fresh-run test kit. Preserve original requirements, independent tests, approval gates and historical evidence. See `docs/repair-20261014.md`; live acceptance is pending.
+
 ## Unreleased — v2.1.0 automation repair (2026-10-13)
 
 Concurrent Tester/Coder preflight; resumable run/watch driver; one human per approval gate for all risks; GitHub and Bitbucket Cloud branch/PR/CI/review integration; provenance, trace union, Codex transport and executable workspace fixes. Host-verified candidate; live environment and remote acceptance pending.

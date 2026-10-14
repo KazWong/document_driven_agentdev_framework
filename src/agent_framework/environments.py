@@ -786,7 +786,14 @@ class Environments:
 
     def retire(self, generation: str) -> None:
         with locked(self.lockfile), self.store.transaction():
-            self.get(generation)
+            # Retirement must remain possible after provider replacement or image loss.
+            value = self.get(generation, require_available=False)
+            if value['status'] != 'promoted':
+                raise Conflict('only a promoted environment generation can be retired')
+            for row in self.store.db.execute("SELECT id FROM generations WHERE status='promoted'"):
+                dependent = self.get(row[0], require_available=False)
+                if generation in dependent['base_generations']:
+                    raise Conflict('environment is a required base of promoted generation ' + row[0])
             if self.store.db.execute(
                 "SELECT 1 FROM leases WHERE generation=?", (generation,)
             ).fetchone():

@@ -6,14 +6,13 @@ Generated from the repaired parser.
 usage: agentctl [-h] [--version] [--project PROJECT] [--state STATE]
                 [--environments ENVIRONMENTS] [--work WORK]
                 [--docker-runtime-profile DOCKER_RUNTIME_PROFILE] [--json]
-                {doctor,init,new,status,propose,provider-preflight,tester-preflight,coder-preflight,reconcile,verified,review,diagnose,import-planning,import-test-design,role,run,sync-review,approve,start,accepting,accept,close,integrity,ci,recover-candidate,promote,publish-pr,candidate,verify,resume,read,evidence,graph,explain,baseline,compact,retire,test-add,suite,test-export,env-seed,env-list,credential-register,env-build,env-retire,env-gc,env-recover-lease,env-publish,env-accept,migrate,rollback,hardware}
-                ...
+                {doctor,init,new,status,propose,provider-preflight,tester-preflight,coder-preflight,reconcile,verified,review,diagnose,import-planning,import-test-design,role,run,sync-review,approve,start,accepting,accept,close,integrity,ci,recover-candidate,recover-role,promote,publish-pr,candidate,verify,resume,read,evidence,graph,explain,baseline,compact,retire,test-add,suite,test-export,env-seed,env-list,credential-register,env-build,env-retire,env-gc,env-recover-lease,env-publish,env-accept,migrate,rollback,hardware} ...
 
 AI Agent Framework 2.1: approved changes, isolated execution, exact-candidate
 evidence
 
 positional arguments:
-  {doctor,init,new,status,propose,provider-preflight,tester-preflight,coder-preflight,reconcile,verified,review,diagnose,import-planning,import-test-design,role,run,sync-review,approve,start,accepting,accept,close,integrity,ci,recover-candidate,promote,publish-pr,candidate,verify,resume,read,evidence,graph,explain,baseline,compact,retire,test-add,suite,test-export,env-seed,env-list,credential-register,env-build,env-retire,env-gc,env-recover-lease,env-publish,env-accept,migrate,rollback,hardware}
+  {doctor,init,new,status,propose,provider-preflight,tester-preflight,coder-preflight,reconcile,verified,review,diagnose,import-planning,import-test-design,role,run,sync-review,approve,start,accepting,accept,close,integrity,ci,recover-candidate,recover-role,promote,publish-pr,candidate,verify,resume,read,evidence,graph,explain,baseline,compact,retire,test-add,suite,test-export,env-seed,env-list,credential-register,env-build,env-retire,env-gc,env-recover-lease,env-publish,env-accept,migrate,rollback,hardware}
     doctor              check backend readiness without claiming acceptance
     init                create a neutral repository; no technology scaffolding
     run                 resume automatic lifecycle until human review or a
@@ -672,3 +671,7 @@ usage: agentctl hardware [-h]
 options:
   -h, --help  show this help message and exit
 ```
+
+### Durable role/candidate recovery
+
+`recover-role` inspects the current checkout's controller-generated file-application journals. It rolls back uncommitted output, retains committed output, and refuses unknown edits. `recover-candidate` resumes only an exact pending candidate for the current work item/package, whether the Git commit has already occurred or not. Neither command grants approval or manufactures passing verification.

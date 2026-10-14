@@ -12,6 +12,7 @@ from typing import Any
 from .common import (
     Conflict,
     FrameworkError,
+    RoleOutputRejected,
     atomic_write,
     bytes_digest,
     contained,
@@ -62,6 +63,7 @@ class Roles:
         includes_independent: bool = False,
         development_suite: dict[str, Any] | None = None,
         accept_guard=None,
+        receipt_id: str | None = None,
     ) -> dict[str, Any]:
         policy = role_policy(name)
         protected = protected or {}
@@ -183,83 +185,127 @@ class Roles:
                     raise FrameworkError(
                         "isolated role execution failed; inspect the controller job log"
                     )
-                response_path = contained(output, "role-output.json")
-                if (
-                    not response_path.is_file()
-                    or response_path.stat().st_size > 4 * 1024 * 1024
-                ):
-                    raise FrameworkError("missing or oversized role output")
-                response = read_json(response_path)
-                if (
-                    not isinstance(response, dict)
-                    or set(response)
-                    != {"schema_version", "role", "input_digest", "output"}
-                    or response["schema_version"] != 1
-                    or response["role"] != name
-                    or response["input_digest"] != input_digest
-                ):
-                    raise FrameworkError(
-                        "role output is malformed or bound to a different input"
-                    )
-                value = response["output"]
-                validate("RoleOutput", value)
-                if (
-                    value["role"] != name
-                    or value["artifact_type"] not in policy["role_outputs"]
-                ):
-                    raise FrameworkError(
-                        "role output attempts a different role's operation"
-                    )
-                if "candidate_sha" in value and value["candidate_sha"] != expected_head:
-                    raise FrameworkError("role reviewed a different candidate")
-                after = inventory(project)
-                changed = sorted(
-                    k
-                    for k in before.keys() | after.keys()
-                    if before.get(k) != after.get(k)
-                )
-                if changed and not writable:
-                    raise FrameworkError("read-only role modified candidate data")
-                for path in changed:
-                    if not in_scope(path, scope) or path in protected:
+                raw_output = None
+                def reject(exc, stage='role_output'):
+                    ref = self.store.publish(
+                        job_id, 'role_rejection', name,
+                        {'input_digest': input_digest, 'candidate_sha': expected_head,
+                         'inputs': inputs, 'generation': generation, 'execution_id': execution.execution_id,
+                         'backend': backend.name, 'log': log, 'raw_output': raw_output,
+                         'rejection_stage': stage, 'findings': [str(exc)]},
+                        [(r['id'], 'derived_from') for r in inputs])
+                    raise RoleOutputRejected(str(exc), ref) from exc
+
+                try:
+                    response_path = contained(output, "role-output.json")
+                    if (
+                        not response_path.is_file()
+                        or response_path.stat().st_size > 4 * 1024 * 1024
+                    ):
+                        raise FrameworkError("missing or oversized role output")
+                    raw_output = self.store.blob(response_path.read_bytes())
+                    response = read_json(response_path)
+                    if (
+                        not isinstance(response, dict)
+                        or set(response)
+                        != {"schema_version", "role", "input_digest", "output"}
+                        or response["schema_version"] != 1
+                        or response["role"] != name
+                        or response["input_digest"] != input_digest
+                    ):
                         raise FrameworkError(
-                            "Coder output changes an unapproved or Tester-owned path: "
-                            + path
+                            "role output is malformed or bound to a different input"
                         )
-                with locked(self.store.root / "controller.lock"), self.store.transaction():
-                    if accept_guard is not None:
-                        accept_guard()
-                    if self.repo.head != expected_head or (writable and not self.repo.clean()):
-                        raise Conflict(
-                            "checkout changed during role execution; output remains unapplied"
+                    value = response["output"]
+                    validate("RoleOutput", value)
+                    if (
+                        value["role"] != name
+                        or value["artifact_type"] not in policy["role_outputs"]
+                    ):
+                        raise FrameworkError(
+                            "role output attempts a different role's operation"
                         )
-                    for ref in inputs:
-                        self.store.resolve(ref, current=True)
-                    # Validate all paths first, then copy only approved regular-file edits.
-                    for path in changed:
-                        contained(self.repo.path, path)
-                    for path in changed:
-                        target = contained(self.repo.path, path)
-                        if path not in after:
-                            target.unlink()
-                        else:
-                            atomic_write(
-                                target, (project / path).read_bytes(), after[path][1]
-                            )
-                    return self.store.publish(
-                        job_id,
-                        "role_output",
-                        name,
-                        {
-                            "output": value,
-                            "input_digest": input_digest,
-                            "candidate_sha": expected_head,
-                            "inputs": inputs,
-                            "generation": generation,
-                            "execution_id": execution.execution_id,
-                            "backend": backend.name,
-                            "log": log,
-                            "applied_paths": changed,
-                        },
-                        [(r["id"], "derived_from") for r in inputs],
+                    if "candidate_sha" in value and value["candidate_sha"] != expected_head:
+                        raise FrameworkError("role reviewed a different candidate")
+                except FrameworkError as exc:
+                    reject(exc)
+                try:
+                    after = inventory(project)
+                    changed = sorted(
+                        k
+                        for k in before.keys() | after.keys()
+                        if before.get(k) != after.get(k)
                     )
+                    if changed and not writable:
+                        raise FrameworkError("read-only role modified candidate data")
+                    for path in changed:
+                        if not in_scope(path, scope) or path in protected:
+                            raise FrameworkError(
+                                "Coder output changes an unapproved or Tester-owned path: "
+                                + path
+                            )
+                    if value['artifact_type'] != context['expected_output']:
+                        raise FrameworkError('role output does not match the required workflow stage')
+                    for key in ('package_ref', 'test_design_ref', 'handoff_ref', 'blueprint_ref', 'plan_ref', 'failure_ref'):
+                        if key in value and value[key] != context.get(key):
+                            raise FrameworkError('role output is bound to a different ' + key)
+                    if value.get('feasible') is False and not value.get('findings'):
+                        raise FrameworkError('infeasibility requires a concrete explanation')
+                except FrameworkError as exc:
+                    reject(exc, 'role_policy')
+                if writable:
+                    try:
+                        from .scm import validate_changes
+                        if (value['artifact_type'] != 'implementation_trace'
+                                or value['package_ref'] != context['package_ref']
+                                or value['incomplete_obligations']):
+                            raise FrameworkError('Coder implementation trace is incomplete or bound to a different package')
+                        validate_changes(value['changes'], changed, context['plan'])
+                    except FrameworkError as exc:
+                        reject(exc, 'implementation_trace')
+                from . import worktree_apply
+                journal = journal_value = None
+                with locked(self.store.root / 'controller.lock'):
+                    worktree_apply.recover(self.store, self.repo)
+                    try:
+                        with self.store.transaction():
+                            if accept_guard is not None:
+                                accept_guard()
+                            if self.repo.head != expected_head or (writable and not self.repo.clean()):
+                                raise Conflict('checkout changed during role execution; output remains unapplied')
+                            for ref in inputs:
+                                self.store.resolve(ref, current=True)
+                            if changed:
+                                journal, journal_value = worktree_apply.prepare(
+                                    self.store, self.repo, job_id, changed, project, after)
+                                worktree_apply.apply(self.store, self.repo, journal_value)
+                            ref = self.store.publish(
+                                job_id,
+                                "role_output",
+                                name,
+                                {
+                                    "output": value,
+                                    "input_digest": input_digest,
+                                    "candidate_sha": expected_head,
+                                    "inputs": inputs,
+                                    "generation": generation,
+                                    "execution_id": execution.execution_id,
+                                    "backend": backend.name,
+                                    "log": log,
+                                    "applied_paths": changed,
+                                },
+                                [(r["id"], "derived_from") for r in inputs],
+                            )
+                            if receipt_id:
+                                self.store.publish(receipt_id, 'automation_receipt', 'framework',
+                                                   {'job': ref}, [(ref['id'], 'derived_from')])
+                    except BaseException:
+                        if journal_value is not None:
+                            # The SQLite transaction has rolled back; return the checkout
+                            # to its known bytes. Keep the journal if recovery is uncertain.
+                            worktree_apply.rollback(self.store, self.repo, journal_value)
+                            journal.unlink(missing_ok=True)
+                        raise
+                    if journal:
+                        journal.unlink(missing_ok=True)
+                    return ref

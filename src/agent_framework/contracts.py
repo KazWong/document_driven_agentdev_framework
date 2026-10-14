@@ -16,6 +16,15 @@ def validate(definition: str, value: Any) -> None:
     validator = Draft202012Validator(
         {"$defs": schema["$defs"], "$ref": "#/$defs/" + definition}
     )
+    if definition == 'RoleOutput' and isinstance(value, dict):
+        # Discriminate the canonical union to report the actual failing field.
+        for branch in schema['$defs']['RoleOutput'].get('oneOf', []):
+            target = schema['$defs'].get(branch.get('$ref', '').rsplit('/', 1)[-1], branch)
+            properties = target.get('properties', {})
+            if (properties.get('role', {}).get('const') == value.get('role')
+                    and properties.get('artifact_type', {}).get('const') == value.get('artifact_type')):
+                validator = Draft202012Validator({'$defs': schema['$defs'], **target})
+                break
     errors = sorted(validator.iter_errors(value), key=lambda e: str(list(e.path)))
     if errors:
         e = errors[0]
@@ -144,8 +153,12 @@ def validate_plan(plan: dict[str, Any], bp: dict[str, Any]) -> None:
     scope = plan["scope"]
     if set(scope) != {"include", "exclude"} or not scope["include"]:
         raise FrameworkError("plan scope must include explicit allowed paths")
-    for pattern in scope["include"] + scope["exclude"]:
-        safe_relative(pattern)
+    for group in ('include', 'exclude'):
+        for index, pattern in enumerate(scope[group]):
+            try:
+                safe_relative(pattern)
+            except FrameworkError as exc:
+                raise FrameworkError(f'Plan.scope.{group}[{index}]: {exc}; use repository-relative paths such as tests/**, not /tests/**') from exc
     requirements = {x["id"] for x in bp["requirements"]}
     covered = set()
     task_ids = set()
@@ -161,8 +174,16 @@ def validate_plan(plan: dict[str, Any], bp: dict[str, Any]) -> None:
         design = {x["id"] for x in bp["components"] + bp["interfaces"]}
         if not task["design"] or not set(task["design"]) <= design:
             raise FrameworkError("task needs known Blueprint elements")
-        for path in task["paths"]:
-            safe_relative(path)
+        for index, path in enumerate(task['paths']):
+            try:
+                safe_relative(path)
+            except FrameworkError as exc:
+                raise FrameworkError(f"Plan.tasks[{task['id']}].paths[{index}]: {exc}; paths are repository-relative") from exc
+            # Conservative containment for advertised task patterns. Concrete edits
+            # are separately checked against include AND exclude at application time.
+            import fnmatch
+            if not any(fnmatch.fnmatchcase(path, allowed) for allowed in scope['include']):
+                raise FrameworkError(f"Plan task {task['id']} path {path!r} is outside declared scope")
         covered.update(task["requirements"])
     mandatory = {x["id"] for x in bp["requirements"] if x["disposition"] == "required"}
     if not mandatory <= covered:

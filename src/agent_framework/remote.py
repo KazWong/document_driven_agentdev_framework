@@ -189,11 +189,11 @@ def delivery_for(repo, scm):
     host = {'github': 'github.com', 'bitbucket': 'bitbucket.org'}.get(provider)
     if host is None:
         raise FrameworkError('unsupported SCM provider')
-    remote = repo.git('remote', 'get-url', 'origin').strip()
+    remotes = repo.git('remote', 'get-url', '--all', 'origin').strip().splitlines()
     allowed = {f'git@{host}:{repository}.git', f'https://{host}/{repository}.git',
                f'https://{host}/{repository}', f'ssh://git@{host}/{repository}.git'}
-    push_remote = repo.git('remote', 'get-url', '--push', 'origin').strip()
-    if remote not in allowed or push_remote not in allowed:
+    push_remotes = repo.git('remote', 'get-url', '--all', '--push', 'origin').strip().splitlines()
+    if len(remotes) != 1 or len(push_remotes) != 1 or remotes[0] not in allowed or push_remotes[0] not in allowed:
         raise Conflict('origin fetch/push URL differs from approved SCM repository')
     obj = GitHubDelivery(repo) if provider == 'github' else BitbucketDelivery(repo, repository)
     obj.repository = repository
@@ -321,7 +321,17 @@ class BitbucketDelivery(GitHubDelivery):
                     and c.get('content', {}).get('raw', '').strip() == 'APPROVE ' + candidate]
         if not eligible:
             raise Conflict('Awaiting human approval and PR comment: APPROVE ' + candidate)
-        self._view(pr, candidate)
+        current = self._view(pr, candidate)
+        participants = current.get('participants', [])
+        if any(p.get('state') == 'changes_requested' for p in participants):
+            raise Conflict('Bitbucket review changed during comment retrieval')
+        still_approved = {p['user']['uuid'] for p in participants if p.get('approved')
+                          and p.get('user', {}).get('type') == 'user'
+                          and p['user']['uuid'] in self.reviewers
+                          and p['user']['uuid'] != current['author']['uuid']}
+        eligible = [item for item in eligible if item['user']['uuid'] in still_approved]
+        if not eligible:
+            raise Conflict('Bitbucket approval was revoked during comment retrieval')
         item = sorted(eligible, key=lambda x: x['id'])[-1]
         return {'actor': item['user']['uuid'], 'candidate_sha': candidate,
                 'review_id': item['id'], 'provider': 'bitbucket', 'url': pr['url']}

@@ -63,7 +63,7 @@ def test_migration_resumes_interrupted_pending_store(tmp_path):
     target = tmp_path / "new"
     planned = migration.plan(source, target)
     pending = tmp_path / "new.pending"
-    pending.mkdir()
+    pending.mkdir(mode=0o700)
     from agent_framework.common import write_json
 
     write_json(pending / "migration-pending.json", planned)

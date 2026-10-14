@@ -40,6 +40,9 @@ class Repository:
             ],
             cwd=self.path,
             timeout=timeout,
+            env={**{k: os.environ[k] for k in ('SSH_AUTH_SOCK', 'SSH_AGENT_PID') if k in os.environ},
+                 'GIT_LITERAL_PATHSPECS': '1', 'GIT_TERMINAL_PROMPT': '0',
+                 'GCM_INTERACTIVE': 'never'},
         )
         if result.returncode or result.timed_out or result.output_limited:
             raise FrameworkError("Git operation failed: " + result.stderr[:600])
@@ -174,6 +177,8 @@ class Repository:
         self.git("add", "--all", "--", *sorted(changed))
         tree = sha(self.git("write-tree").strip())
         self.files(tree)
+        if not self.diff(base, tree):
+            raise FrameworkError('candidate has no change relative to its work-item baseline')
         if validate_tree:
             validate_tree(tree)
         if self.head != expected_head:
@@ -224,6 +229,14 @@ def validate_trace(
         raise FrameworkError(
             "implementation trace must cover the exact nonempty Git diff"
         )
+    validate_changes(changes, actual, plan)
+
+
+def validate_changes(changes, actual, plan):
+    """Validate a role delta before copying it into the trusted worktree."""
+    paths = [x['path'] for x in changes]
+    if len(paths) != len(set(paths)) or set(paths) != set(actual):
+        raise FrameworkError('implementation trace must cover exactly the changed paths')
     tasks = {x["id"]: x for x in plan["tasks"]}
     for change in changes:
         if not in_scope(change["path"], plan["scope"]):

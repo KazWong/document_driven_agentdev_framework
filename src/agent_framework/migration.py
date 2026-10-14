@@ -112,7 +112,7 @@ def apply(source: Path, target: Path, *, expected_digest: str) -> dict[str, Any]
                 "already_applied": True,
             }
         pending = target.parent / (target.name + ".pending")
-        pending.mkdir(parents=True, exist_ok=True)
+        pending.mkdir(parents=True, exist_ok=True, mode=0o700)
         marker = pending / "migration-pending.json"
         if marker.exists() and read_json(marker)["input_digest"] != expected_digest:
             raise Conflict("pending migration was created from different source bytes")

@@ -55,6 +55,8 @@ class Store:
     def __init__(self, root: Path):
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if self.root.stat().st_mode & 0o077:
+            raise FrameworkError('controller state must be a private owner-only directory; chmod 700 ' + str(self.root))
         self.objects = self.root / "objects"
         self.objects.mkdir(exist_ok=True, mode=0o700)
         self.db = sqlite3.connect(
