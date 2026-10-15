@@ -119,7 +119,6 @@ def parser() -> argparse.ArgumentParser:
         "integrity",
         "ci",
         "recover-candidate",
-        "recover-role",
     ):
         sub.add_parser(name)
     q = sub.add_parser("promote")
@@ -233,7 +232,7 @@ def execute(a: argparse.Namespace) -> Any:
         }
     if a.command == "hardware":
         raise FrameworkError(
-            "automatic physical execution is disabled; R3 operations require a separate reviewed procedure, one human approval per gate and an explicitly approved hardware provider"
+            "automatic physical execution is disabled; R3 operations require a separate reviewed procedure, two human approvals and an explicitly approved hardware provider"
         )
     if a.command == "migrate":
         if a.apply and not a.digest:
@@ -315,17 +314,8 @@ def execute(a: argparse.Namespace) -> Any:
             "--state must name a private controller directory outside the project"
         )
     envroot = a.environments or a.state.parent / "environments"
-    for root in (a.state, envroot):
-        if root.resolve().is_relative_to(a.project.resolve()):
-            raise FrameworkError('controller and environment state must be outside the product checkout')
-    if envroot.resolve() == a.state.resolve():
-        raise FrameworkError('controller and environment ledgers must use distinct directories')
     environments = Environments(envroot, {"docker": backend})
-    try:
-        store = Store(a.state)
-    except BaseException:
-        environments.store.close()
-        raise
+    store = Store(a.state)
     try:
         if a.command == "env-seed":
             release = read_json(a.release)
@@ -496,7 +486,7 @@ def execute(a: argparse.Namespace) -> Any:
             return engine.record_ci()
         if a.command == "promote":
             return engine.promote(remote_authorized=a.authorize_remote)
-        if a.command in {"start", "accepting", "accept", "close", "recover-candidate", "recover-role"}:
+        if a.command in {"start", "accepting", "accept", "close", "recover-candidate"}:
             return getattr(engine, a.command.replace("-", "_"))()
         raise FrameworkError("unimplemented command")
     finally:

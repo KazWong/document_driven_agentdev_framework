@@ -23,12 +23,7 @@ class DockerBackend:
         self.runtime_profile = runtime_profile
 
     def _call(self, args: list[str], **kwargs: Any):
-        # Client connection settings belong only to trusted Docker orchestration.
-        # Do not strip TLS verification from a configured remote daemon connection.
-        env = {k: os.environ[k] for k in ('DOCKER_CONFIG', 'DOCKER_CERT_PATH',
-                                         'DOCKER_TLS', 'DOCKER_TLS_VERIFY') if k in os.environ}
-        env.update(kwargs.pop('env', {}) or {})
-        return self.executor.run(['docker', *args], env=env, **kwargs)
+        return self.executor.run(["docker", *args], **kwargs)
 
     def doctor(self) -> dict[str, Any]:
         if shutil.which("docker") is None:
@@ -178,7 +173,6 @@ class DockerBackend:
                     target,
                 )
                 or target in used
-                or any(part in {'.', '..', ''} for part in target.split('/')[1:])
             ):
                 raise FrameworkError("unapproved read-only mount target")
             used.add(target)

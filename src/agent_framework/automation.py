@@ -1,7 +1,7 @@
 """Resumable controller orchestration. Human approvals are never synthesized."""
 from concurrent.futures import ThreadPoolExecutor
 
-from .common import Conflict, FrameworkError, RoleOutputRejected, digest, identifier, locked
+from .common import Conflict, FrameworkError, digest, locked
 from .engine import Engine
 from .environments import Environments
 from .policy import needs_safety
@@ -12,25 +12,7 @@ from .test_artifacts import development_hashes
 
 class Automation:
     def __init__(self, engine, config):
-        if not isinstance(config, dict):
-            raise FrameworkError('automation config must be an object')
-        self.engine, self.config = engine, dict(config)
-        allowed = {'generation', 'role_action', 'selections', 'verify_actions',
-                   'repair_budget', 'authorize_remote', 'actor', 'title'}
-        if set(config) - allowed:
-            raise FrameworkError('unknown automation config fields: ' + ', '.join(sorted(set(config) - allowed)))
-        if type(config.get('authorize_remote', False)) is not bool:
-            raise FrameworkError('authorize_remote must be a JSON boolean')
-        for key in ('generation', 'role_action', 'actor', 'title'):
-            if key in config and (not isinstance(config[key], str) or not config[key].strip()):
-                raise FrameworkError(key + ' must be a nonempty string')
-        for key in ('selections', 'verify_actions'):
-            if key in config and (not isinstance(config[key], dict) or not config[key]
-                                  or any(not isinstance(k, str) or not k or not isinstance(v, str) or not v.strip()
-                                         for k, v in config[key].items())):
-                raise FrameworkError(key + ' must map requirement IDs to nonempty strings')
-        if 'generation' in config:
-            identifier(config['generation'])
+        self.engine, self.config = engine, config
         for key in ('generation', 'role_action', 'selections', 'verify_actions'):
             if key not in config:
                 raise FrameworkError('automation config missing ' + key)
@@ -45,7 +27,6 @@ class Automation:
             envs = Environments(parent.environments.store.root, parent.environments.backends)
             try:
                 engine = Engine(Repository(parent.repo.path), store, envs, parent.work_id)
-                engine.recover_role()
                 work = engine.work
                 key = engine.work_id + '-AUTO-' + digest({
                     'role': name, 'state': work['state'], 'suite': suite,
@@ -58,9 +39,9 @@ class Automation:
                     receipt = store.get(key)['payload']
                     store.resolve(receipt['job'], current=True)
                     return receipt['job']
-                # Job and scheduler receipt commit atomically with role application.
-                return engine.run_role(name, self.config['generation'], self.config['role_action'],
-                                       suite_ref=suite, receipt_id=key)
+                job = engine.run_role(name, self.config['generation'], self.config['role_action'], suite_ref=suite)
+                store.publish(key, 'automation_receipt', 'framework', {'job': job}, [(job['id'], 'derived_from')])
+                return job
             finally:
                 envs.store.close()
 
@@ -92,66 +73,35 @@ class Automation:
                 w = e.work
                 state = w['state']
                 if state == 'INTAKE':
-                    try:
-                        e.import_planning(self._role('planner'))
-                    except RoleOutputRejected:
-                        continue
+                    e.import_planning(self._role('planner'))
                 elif state == 'DRAFT':
                     e.provider_preflight(self.config['selections'])
                 elif state == 'PROVIDER_FEASIBLE':
-                    errors = []
-                    jobs = []
                     with ThreadPoolExecutor(max_workers=2) as pool:
-                        futures = [pool.submit(self._role, name) for name in ('tester', 'coder')]
-                        for future in futures:
-                            try:
-                                jobs.append(future.result())
-                            except (RoleOutputRejected, Conflict) as exc:
-                                errors.append(exc)
-                    if errors:
-                        if e.work['state'] == 'REPLAN_REQUIRED':
-                            continue
-                        raise errors[0]
-                    test_job, code_job = jobs
+                        tester = pool.submit(self._role, 'tester')
+                        coder = pool.submit(self._role, 'coder')
+                        test_job, code_job = tester.result(), coder.result()
                     assessment = e._role_output(code_job, 'coder', [w['draft'], w['provider_feasibility']])
-                    if (assessment['artifact_type'] != 'implementation_feasibility'
-                            or assessment['package_ref'] != w['draft']
-                            or assessment['handoff_ref'] != w['draft']):
-                        raise FrameworkError('preliminary Coder assessment has mismatched stage or references')
                     if not assessment['feasible']:
                         with locked(e.lockfile), e.store.transaction():
                             e._replan(e.work, code_job, assessment['findings'])
                         continue
                     # Successful preliminary Coder review cannot replace test handoff.
-                    try:
-                        suite = e.import_test_design(test_job)
-                        e.tester_preflight(suite, self._role('tester', suite))
-                    except RoleOutputRejected:
-                        continue
+                    suite = e.import_test_design(test_job)
+                    e.tester_preflight(suite, self._role('tester', suite))
                 elif state == 'TESTER_FEASIBLE':
-                    try:
-                        e.coder_preflight(self._role('coder'))
-                    except RoleOutputRejected:
-                        continue
+                    e.coder_preflight(self._role('coder'))
                 elif state == 'FEASIBLE':
-                    try:
-                        e.reconcile(self._role('planner'))
-                    except RoleOutputRejected:
-                        continue
+                    e.reconcile(self._role('planner'))
                 elif state == 'APPROVAL_READY':
                     return self._pause('One human must approve the current engineering package digest.')
                 elif state == 'APPROVED':
                     e.start()
                 elif state == 'IMPLEMENTING':
-                    if e.pending_candidate_intents():
+                    if list(e.store.root.glob('candidate-intent-*.json')):
                         e.recover_candidate()
                         continue
-                    try:
-                        job = self._role('coder')
-                    except RoleOutputRejected:
-                        if e.work['state'] != 'BLOCKED':
-                            raise
-                        continue
+                    job = self._role('coder')
                     output = e._current(job)['output']
                     if output['incomplete_obligations']:
                         raise Conflict('Coder reports incomplete obligations')
@@ -234,22 +184,14 @@ class Automation:
                         return self._pause('Failure requires ' + owner + '; automatic repair budget remaining: ' + str(max(0, self.budget-count)))
                     e.resume('automation-policy', repair_source=True, automatic_budget=self.budget)
                 elif state == 'REPLAN_REQUIRED':
-                    # Reserve before dispatch, not after successful import. A restart
-                    # resumes the same reservation/receipt; a new failure needs a new one.
+                    if w.get('automatic_replans', 0) >= self.budget:
+                        return self._pause('Planner revision budget exhausted.')
+                    count = w.get('automatic_replans', 0)
+                    e.import_planning(self._role('planner'))
                     with locked(e.lockfile), e.store.transaction():
                         current = e.work
-                        failure = current['failures'][-1]
-                        if current.get('automatic_replan_attempt') != failure:
-                            count = current.get('automatic_replans', 0)
-                            if count >= self.budget:
-                                return self._pause('Planner revision budget exhausted.')
-                            current['automatic_replans'] = count + 1
-                            current['automatic_replan_attempt'] = failure
-                            e._save(current)
-                    try:
-                        e.import_planning(self._role('planner'))
-                    except RoleOutputRejected:
-                        continue
+                        current['automatic_replans'] = count + 1
+                        e._save(current)
                 else:
                     raise Conflict('Unsupported automation state ' + state)
             raise Conflict('Automation step budget exhausted; inspect state before continuing')

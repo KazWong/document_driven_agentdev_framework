@@ -25,19 +25,7 @@ def decode_transport(value):
         or not isinstance(value["payload"], str)
     ):
         raise ValueError("Codex transport output must contain exactly one payload string")
-    def unique_pairs(pairs):
-        result = {}
-        for key, item in pairs:
-            if key in result:
-                raise ValueError('duplicate JSON key: ' + key)
-            result[key] = item
-        return result
-
-    def invalid_constant(value):
-        raise ValueError('non-finite JSON number: ' + value)
-
-    decoded = json.loads(value['payload'], object_pairs_hook=unique_pairs,
-                         parse_constant=invalid_constant)
+    decoded = json.loads(value["payload"])
     if not isinstance(decoded, dict):
         raise ValueError("Codex transport payload must decode to a JSON object")
     return decoded
@@ -75,8 +63,6 @@ def main():
         "Return exactly one JSON object with a payload string. The payload string must itself be the JSON "
         "serialization of only the appropriate canonical typed RoleOutput, with the supplied references and candidate SHA. "
         "Do not put markdown or commentary inside or outside the payload. "
-        "Plan scope, task paths and test case paths are repository-relative (tests/**), never container paths (/tests/**). "
-        "For Coder implementation, changes must describe exactly the files changed in this execution; the controller aggregates prior commits. "
         "If feasibility fails, report the exact affected requirement and reason.\n"
         + json.dumps(context, ensure_ascii=False)
         + "\nCanonical output schema (RoleOutput):\n" + canonical_schema

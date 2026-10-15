@@ -1,4 +1,4 @@
-# AI Agent Framework 2.1.0 - repair 20261014-r1
+# AI Agent Framework 2.1.0 — automation repair candidate
 
 A clean implementation of the approved v2.1 architecture: revision-bound engineering packages, isolated roles, immutable candidates, managed environments, traceable evidence and mandatory final acceptance.
 
@@ -6,13 +6,7 @@ A clean implementation of the approved v2.1 architecture: revision-bound enginee
 
 The package name is `ai-agent-framework`; Python code lives in `agent_framework`. Architecture principles use `P-*`; the sole decision register uses `D-001` through `D-043`. Legacy runtime code is replaced. Existing product repositories are preserved, with an explicit historical-state importer.
 
-## Repair 20261014-r1
-
-This repair is based on the exact uploaded v2.1.0/work005 sources. VERSION remains 2.1.0; `REPAIR-ID` and the source/kit manifests distinguish this build. See [the repair findings and verification boundaries](docs/repair-20261014.md). Host tests do not establish live acceptance or release promotion.
-
-The matching test kit uses fresh `ros2-counter-v210-repair-20261014-01` / `WORK-REPAIR-20261014-001` defaults. Do not reuse WORK-005 state or transplant a previous run's acceptance, image or sandbox-probe receipts. Rebuild images containing framework code.
-
-## Previous automation repair
+## Automation repair
 
 See [the revised design and defect scope](docs/design/automation-repair-ecp.md) and [run/watch instructions](docs/automation.md). This candidate adds concurrent preflight, resumable orchestration, one human per gate at every risk, and GitHub/Bitbucket Cloud review delivery. Historical verification reports describe their original source only.
 

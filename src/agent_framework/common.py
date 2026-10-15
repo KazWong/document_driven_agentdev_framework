@@ -26,14 +26,6 @@ class IntegrityError(FrameworkError):
     """Recorded content or an immutable binding is inconsistent."""
 
 
-class RoleOutputRejected(FrameworkError):
-    """An isolated job produced invalid output; immutable evidence is retained."""
-
-    def __init__(self, message: str, reference: dict[str, Any]):
-        super().__init__(message)
-        self.reference = reference
-
-
 class LeaseRetained(FrameworkError):
     """An execution may still exist; its lease requires explicit recovery."""
 

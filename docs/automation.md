@@ -76,18 +76,3 @@ python scripts/generate_projection.py --check
 ```
 
 The delivered test results are host/contract evidence. A fresh target-host run from intake through remote review and closure is still necessary to establish live autonomy.
-
-## Recovery and rejection behavior in repair 20261014-r1
-
-Automation configuration is a strict object. `authorize_remote` must be a JSON boolean: `false` denies remote mutation; the string `"false"` is rejected. Repair budget is an integer from 0 through 10 (default 2). Planner revisions reserve a persistent attempt before dispatch; an invalid revision consumes an attempt, and restarting does not reset the budget. A rejected schema/semantic output is retained with its field-level finding. Fresh revision context contains the failure instead of silently reusing the invalid output. Pre-approval Tester/Coder/reconciliation rejection returns to Planner; any revised engineering package requires a new human approval.
-
-Coder implementations are checked against their exact changed paths, task/requirement/design mappings, scope, protected tests and complete obligations before controller files are copied. File applications have a durable before/after journal. The role job and automation receipt commit in one SQLite transaction. A restart retains a committed application or restores an uncommitted one; an unknown external edit stops recovery.
-
-```bash
-fw recover-role
-fw recover-candidate
-```
-
-Normal automation invokes matching recovery itself. `recover-candidate` accepts only the current work/package and exact intended Git tree; it covers interruption both before and after commit. Do not modify recovery journals to bypass an error. These checks exercise process interruption, not a proof against every filesystem, storage or power-loss failure.
-
-State and environment registry directories must be owner-only (mode 0700) and outside the product checkout. For an existing trusted directory, review its ownership/contents before explicitly correcting permissions; the controller never silently makes an arbitrary directory private. Trusted Git alone receives SSH agent variables; role/provider processes do not. Git delivery permits exactly one approved fetch URL and one approved push URL. Docker client TLS/configuration variables are preserved at the trusted Docker boundary.
